@@ -1,0 +1,16 @@
+{
+  "name": "swe4724",
+  "description": "SEW4724 Capstone Project of a doctor's office appointment system",
+  "main": "bin/app.js",
+  "homepage": "https://github.com/tutman96/SWE4724",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-css-only": "^3.3.7"
+  }
+}

@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es6",
+		"removeComments": true,
+		"sourceMap": true,
+		"outDir": "bin"
+	},
+	"filesGlob": [
+		"source/**/*.ts"
+	]
+}

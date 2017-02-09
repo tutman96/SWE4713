@@ -1,0 +1,31 @@
+{
+  "name": "swe4713",
+  "version": "1.0.0",
+  "description": "swe4713 Application domain project",
+  "main": "bin/app.js",
+  "scripts": {
+    "build": "./node_modules/.bin/tsc -p .",
+    "update": "npm install && ./node_modules/.bin/bower install",
+    "start_prod": "./node_modules/.bin/pm2 start run.json --env production",
+    "restart_prod": "./node_modules/.bin/pm2 restart run.json",
+    "start": "node ./bin/app.js"
+  },
+  "dependencies": {
+    "@types/express": "^4.0.35",
+    "@types/morgan": "^1.7.32",
+    "@types/mysql": "0.0.31",
+    "@types/serve-static": "^1.7.31",
+    "ejs": "^2.5.5",
+    "express": "^4.14.1",
+    "express-minify-html": "^0.9.0",
+    "mongo-sql": "^3.0.0",
+    "morgan": "^1.7.0",
+    "mysql": "^2.13.0",
+    "serve-static": "^1.11.2"
+  },
+  "devDependencies": {
+    "bower": "^1.8.0",
+    "pm2": "^2.3.0",
+    "typescript": "^2.1.6"
+  }
+}
