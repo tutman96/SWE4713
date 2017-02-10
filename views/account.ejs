@@ -1,0 +1,122 @@
+<%- include('partials/header') %>
+
+<span class="title"><%= title %></span>
+<div class="container">
+	<div class="panel-body">
+		<div id="accountForm" class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Account Number</label>
+				<div class="col-sm-10">
+					<input type="number" class="form-control" name="AccountNumber" value="<%=account.AccountNumber%>" <%=!isNew ? "readonly" : ""%>>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Account Name</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" name="AccountName" value="<%=account.AccountName%>">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputAccountNumber" class="col-sm-2 control-label">Account Type</label>
+				<div class="col-sm-10">
+					<select class="form-control" name="AccountType">
+						<% for (var accountType of accountTypes) { %>
+							<option value="<%=accountType.AccountType%>" <%-account.AccountType && (account.AccountType.AccountType == accountType.AccountType ? "selected" : "")%>>
+								<%=accountType.AccountType%> (#<%=accountType.MinCode%> - <%=accountType.MaxCode%>)
+							</option>
+						<% } %>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Initial Balance</label>
+				<div class="col-sm-10">
+					<div class="input-group">
+						<span class="input-group-addon">$</span>
+						<input type="number" class="form-control" name="InitialBalance" value="<%=account.InitialBalance || "0.00"%>" step="0.01">
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Sort Order</label>
+				<div class="col-sm-10">
+					<input type="number" class="form-control" name="SortOrder" value="<%=account.SortOrder || 0%>">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Active</label>
+				<div class="col-sm-10">
+					<input type="checkbox" class="form-control" name="Active" <%=(account.Active ? 'checked' : '')%>>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<div class="alert alert-danger" id="error" style="display:none"></div>
+				<div class="col-sm-offset-2 col-sm-10 text-right">
+					<% if (!isNew) { %><button id="delete" class="btn btn-danger pull-left">Delete</button><% } %>
+					<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	var accountTypes = <%-JSON.stringify(accountTypes)%>;
+	var account = <%-JSON.stringify(account)%>;
+	
+	$("#save").click(function () {
+		$("#error").hide();
+		
+		var formData = {
+			AccountNumber: +$("input[name=AccountNumber]").val(),
+			AccountType: $("select[name=AccountType]").val(),
+			AccountName: $("input[name=AccountName]").val(),
+			InitialBalance: +$("input[name=InitialBalance]").val(),
+			SortOrder: +$("input[name=SortOrder]").val(),
+			Active: !!$("input[name=Active]").prop('checked')
+		}
+		
+		var accountType = accountTypes.filter((at) => at.AccountType == formData.AccountType)[0];
+		if (!accountType) return;
+		
+		if (formData.AccountNumber < accountType.MinCode || formData.AccountNumber > accountType.MaxCode) {
+			$("#error").show().text("Account Number out of range. Must be between " + accountType.MinCode + " and " + accountType.MaxCode)
+			return;
+		}
+		
+		$.ajax({
+			method: "POST",
+			url: "/account/" + (account.AccountNumber ? account.AccountNumber : "new"),
+			dataType: "json",
+			data: formData,
+			success: function (data, text) {
+				console.log(arguments);
+				location.href = "/accounts"
+			},
+			error: function (request, status, error) {
+				console.error(error);
+				$("#error").show().text(request.responseText);
+			}
+		})
+	})
+	
+	$("#delete").click(function () {
+		if (confirm("Are you sure you want to delete " + account.AccountName + "?")) {
+			$.ajax({
+				method: "DELETE",
+				url: "/account/" + account.AccountNumber,
+				success: function (data, text) {
+					console.log(arguments);
+					location.href = "/accounts"
+				},
+				error: function (request, status, error) {
+					console.error(error);
+					$("#error").show().text(request.responseText);
+				}
+			})
+		}
+	})
+</script>
+
+<%- include('partials/footer') %>

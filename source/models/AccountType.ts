@@ -8,7 +8,7 @@ class AccountType {
 	MaxCode: number
 	IncreaseEntry: 'CREDIT' | 'DEBIT'
 
-	private static async construct(props: {[K in keyof AccountType]: AccountType[K]}) {
+	static async construct(props: {[K in keyof AccountType]: AccountType[K]}) {
 		var at = new AccountType();
 		at.AccountType = props.AccountType;
 		at.MinCode = props.MinCode;
@@ -18,12 +18,12 @@ class AccountType {
 	}
 
 	private static builder = queryBuilder<AccountType>("AccountType")
-	static async find(query: query<AccountType>) {
+	static async find(query: query<AccountType> = {}) {
 		var sql = this.builder(query);
 		var results = await database.query<any>(sql);
 		return Promise.all(results.map(this.construct))
 	}
-	
+
 	static async findOne(query: query<AccountType>) {
 		var sql = this.builder(query, 1);
 		var results = await database.query<any>(sql);

@@ -1,5 +1,6 @@
 import express = require('express');
 import morgan = require('morgan');
+import bodyParser = require('body-parser');
 
 import ejs = require('ejs');
 import serveStatic = require('serve-static');
@@ -13,6 +14,8 @@ morgan.token('remote-addr', (req, res) => {
 var app = express();
 app.set('view engine', 'ejs');
 app.use(morgan('combined'));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 app.use(minifyHTML({
 	override: true,
 	exception_url: false,
@@ -26,10 +29,38 @@ app.use(minifyHTML({
 	}
 }));
 
+app.use((req, res, next) => {
+	var title = req.path.replace(/\//g,"").toLowerCase();
+	title = title[0].toUpperCase() + title.substr(1);
+	res.locals = {
+		title: title,
+		path: req.path,
+		balanceFormat: (balance: number) => "$" + balance.toFixed(2),
+		dateFormat: (date: Date) => date.toString()
+	}
+	
+	var results: any = next();
+	if (results instanceof Promise) {
+		console.log("Promise!");
+		results.catch((err) => {
+			res.status(err.code || 500);
+			res.send(err.toString());
+		})
+	}
+})
+
+
+import accounts = require('./controllers/accounts');
+accounts(app);
 
 app.use(serveStatic('.', {
 	maxAge: (process.env.NODE_ENV == 'production' ? 1000 * 60 * 60 * 24 : 0)
 }))
+
+app.use((req, res) => {
+	res.status(404);
+	res.render("404");
+})
 
 app.listen(8080, () => {
 	console.log("The app is now running on port 8080")

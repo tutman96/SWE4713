@@ -28,7 +28,10 @@ interface queryResults<T> extends Array<T> {
 export = {
 	query: async <T>(sql: string, params?: Array<any>) => {
 		return new Promise<queryResults<T>>((resolve, reject) => {
+			var start = process.hrtime();
 			var q = pool.query(sql, params || [], (err, results) => {
+				var time = process.hrtime(start);
+				console.log("Database " + q.sql + " (" + (time[1]/1e6).toFixed(2) + " ms)");
 				if (err) {
 					console.error("Error executing SQL statement for query", q.sql, err);
 					reject(err);
