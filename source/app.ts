@@ -30,7 +30,8 @@ app.use(minifyHTML({
 }));
 
 app.use((req, res, next) => {
-	var title = req.path.replace(/\//g,"").toLowerCase();
+	var p = req.path.replace(/\//g,"");
+	var title = (p && p.toLowerCase()) || "SWE4713 - Double Entry Accounting";
 	title = title[0].toUpperCase() + title.substr(1);
 	res.locals = {
 		title: title,
