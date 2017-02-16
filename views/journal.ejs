@@ -1,31 +1,83 @@
 <%- include('partials/header') %>
 
-<div class="title"><%= title %></div>
+<div class="title">Journal: <%= title %></div>
 <% if (message) { %><div class="alert alert-info"><%= message %></div><% } %>
 <div class="container">
-	<div class="panel-body">
-		<div class="form-horizontal">
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Description</label>
-				<div class="col-sm-10">
-					<input type="text" class="form-control" name="Description" value="<%=journal.Description%>">
-				</div>
+	<div class="form-horizontal">
+		<div class="form-group">
+			<label class="col-sm-2 control-label">Description</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" name="Description" value="<%=journal.Description%>">
 			</div>
-			<div class="form-group">
-				<div class="alert alert-danger" id="error" style="display:none"></div>
-				<div class="col-sm-offset-2 col-sm-10 text-right">
-					<% if (!isNew) { %>
-						<% if (journal.Closed) { %>
-							<button id="reopen" class="btn btn-warning pull-left" <%-(canBeOpened ? "" : "disabled")%>>Reopen</button>
-						<% } else { %>
-							<button id="close" class="btn btn-warning pull-left">Close</button>
-						<% } %>
+		</div>
+		<div class="form-group">
+			<div class="alert alert-danger" id="error" style="display:none"></div>
+			<div class="col-sm-offset-2 col-sm-10 text-right">
+				<% if (!isNew) { %>
+					<% if (journal.Closed) { %>
+						<button id="reopen" class="btn btn-warning pull-left" <%-(canBeOpened ? "" : "disabled")%>>Reopen</button>
+					<% } else { %>
+						<button id="close" class="btn btn-warning pull-left">Close</button>
 					<% } %>
-					<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
-				</div>
+				<% } %>
+				<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
 			</div>
 		</div>
 	</div>
+	<hr>
+	<div class="row">
+		<div class="col-xs-6">
+			<span class="title">Entries</span>
+		</div>
+		<div class="col-xs-6 text-right">
+			<a class="btn btn-success" href="/entry/new" <%=(journal.Closed ? "disabled" : "")%>>New Entry</a>
+		</div>
+	</div>
+	<table class="table table-condensed">
+		<thead>
+			<tr>
+				<th>Date</th>
+				<th>Detail</th>
+				<th>Account</th>
+				<th>Debit</th>
+				<th>Credit</th>
+				<th></th>
+			</tr>
+		</thead>
+		<% for (var entry of journal.entries) { %>
+			<tr>
+				<td rowspan="<%= entry.transactions.length + 1 %>"><%=dateFormat(entry.CreatedDate)%></td>
+				<% for (var i in entry.transactions) { var transaction = entry.transactions[i]; %>
+					<td><%=transaction.account.AccountName%></td>
+					<td><a href="/account/<%=transaction.account.AccountNumber%>"><%=transaction.account.AccountName%></a></td>
+					<td>
+						<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT' && transaction.Value >= 0 || transaction.account.AccountType.IncreaseEntry == 'CREDIT' && transaction.Value < 0) { %>
+							<%=balanceFormat(transaction.Value)%>
+							</td><td></td>
+						<% } else { %>
+							</td><td>
+							<%=balanceFormat(transaction.Value)%>
+							</td>
+						<% } %>
+					</td>
+					<% if (i == 0) { %>
+						<td rowspan="<%= entry.transactions.length + 1 %>" class="text-right"><a class="btn btn-link" href="/entry/<%=entry.EntryId%>">Edit</a></td>
+					<% } %>
+			</tr>
+			<tr>
+				<% } %>
+				<td><%=entry.Description%></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<% if (entry.transactions.length == 0) { %><td rowspan="<%= entry.transactions.length + 1 %>" class="text-right"><a class="btn btn-link" href="/entry/<%=entry.EntryId%>">Edit</a></td><% } %>
+			</tr>
+			<tr><td colspan="6" style="border-top: solid 2px #ddd"></td></tr>
+		<% } %>
+		<% if (journal.entries.length == 0) { %>
+			<tr><td colspan="6" class="text-center text-muted">No entries</td></tr>
+		<% } %>
+	</table>
 </div>
 
 <script>

@@ -63,3 +63,11 @@ CREATE TABLE `Journal` (
   `Closed` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`JournalId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `Entry` (
+  `EntryId` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `JournalId` int(11) NOT NULL,
+  `Description` text NOT NULL,
+  `CreatedDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`EntryId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

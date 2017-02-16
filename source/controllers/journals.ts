@@ -57,6 +57,12 @@ export = (app: express.Application) => {
 				res.render('404');
 			}
 			else {
+				if (!journal.Closed) {
+					res.status(302);
+					res.location("/journal/current");
+					res.end();
+					return;
+				}
 				var openJournals = await Journal.find({ Closed: false });
 
 				res.render('journal', {

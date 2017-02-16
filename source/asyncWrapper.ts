@@ -9,6 +9,7 @@ export = (handler: (req: express.Request, res: express.Response) => Promise<any>
 			}
 		}
 		catch (e) {
+			console.error(e);
 			if (!res.finished) {
 				if (!res.headersSent) {
 					if (e.code) {

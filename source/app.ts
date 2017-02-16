@@ -1,6 +1,7 @@
 import express = require('express');
 import morgan = require('morgan');
 import bodyParser = require('body-parser');
+import moment = require('moment');
 
 import ejs = require('ejs');
 import serveStatic = require('serve-static');
@@ -37,7 +38,7 @@ app.use((req, res, next) => {
 		title: title,
 		path: req.path,
 		balanceFormat: (balance: number) => "$" + balance.toFixed(2),
-		dateFormat: (date: Date) => date.toString()
+		dateFormat: (date: Date) => moment(date).format('LLL')
 	}
 	
 	var results: any = next();
@@ -56,6 +57,9 @@ accounts(app);
 
 import journals = require('./controllers/journals');
 journals(app);
+
+import entries = require('./controllers/entries');
+entries(app);
 
 app.use(serveStatic('.', {
 	maxAge: (process.env.NODE_ENV == 'production' ? 1000 * 60 * 60 * 24 : 0)

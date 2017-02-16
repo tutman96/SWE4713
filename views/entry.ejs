@@ -1,0 +1,234 @@
+<%- include('partials/header') %>
+
+<div class="title">Entry: <%= title %></div>
+<div class="container">
+	<div class="form-horizontal">
+		<div class="form-group">
+			<label class="col-sm-2 control-label">Description</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" name="Description" value="<%=entry.Description%>">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label">Transactions</label>
+			<div class="col-sm-10">
+				<table class="table table-condensed" id="transactions">
+					<thead>
+						<tr>
+							<th>Account</th>
+							<th>Debit</th>
+							<th>Credit</th>
+							<th></th>
+						</tr>
+					</thead>
+					<% for (var transaction of entry.transactions) { %>
+					<tr id="Transaction-Account:<%=transaction.AccountNumber%>">
+						<td><%=transaction.account.AccountName%></td>
+						<td>
+						<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT' && transaction.Value >= 0 || transaction.account.AccountType.IncreaseEntry == 'CREDIT' && transaction.Value <= 0) { %>
+							<%=balanceFormat(transaction.Value)%>
+							</td><td></td>
+						<% } else { %>
+							</td><td>
+							<%=balanceFormat(transaction.Value)%>
+							</td>
+						<% } %>
+						<td class="text-right"><button class="btn btn-danger btn-xs delete-transaction"><b>X</b></button></td>
+					</tr>
+					<% } %>
+					<tr>
+						<td colspan="4" class="text-right">
+							<button id="addTransaction" class="btn btn-success btn-xs"><b>+</b></button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="alert alert-danger" id="error" style="display:none"></div>
+			<div class="col-sm-offset-2 col-sm-10 text-right">
+				<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	var entry = <%-JSON.stringify(entry) %>;
+	var accounts = <%-JSON.stringify(accounts) %>;
+
+	$("#save").click(function () {
+		$("#error").hide();
+
+		var formData = {
+			EntryId: entry.EntryId,
+			JournalId: entry.JournalId,
+			Description: $("input[name=Description]").val(),
+			transactions: JSON.parse(JSON.stringify(entry.transactions))
+		}
+		
+		$("#transactions tr.newTransaction").each(function (i, r) {
+			var row = $(r);
+			var accountNumber = +$(row.children('td').children('select').children().filter((i, e) => e.selected).get(0)).val();
+			
+			var account;
+			for (var i in accounts) {
+				if (accounts[i].AccountNumber == accountNumber) {
+					account = accounts[i];
+				}
+			}
+			
+			var value = 0;
+			if (account.AccountType.IncreaseEntry == "CREDIT") {
+				value = +$(row.children('td').children('input.creditEntry').get(0)).val();
+			}
+			else {
+				value = +$(row.children('td').children('input.debitEntry').get(0)).val();
+			}
+			
+			formData.transactions.push({
+				EntryId: formData.EntryId,
+				AccountNumber: accountNumber,
+				Value: value
+			})
+		})
+		
+		var seen = [];
+		var debits = 0;
+		var credits = 0;
+		for (var i in formData.transactions) {
+			if (seen.indexOf(formData.transactions[i].AccountNumber) != -1) {
+				$("#error").show().text("Duplicate account detected in transactions");
+				return;
+			}
+			seen.push(formData.transactions[i].AccountNumber);
+			for (var j in accounts) {
+				if (formData.transactions[i].AccountNumber == accounts[j].AccountNumber) {
+					if (accounts[j].AccountType.IncreaseEntry == "CREDIT") {
+						credits += formData.transactions[i].Value
+					}
+					else {
+						debits += formData.transactions[i].Value
+					}
+				}
+			}
+		}
+		
+		if (credits != debits) {
+			$("#error").show().text("Entries are not in balance " + debits + "," + credits);
+			return;
+		}
+
+		$.ajax({
+			method: "POST",
+			url: "/entry/" + (entry.EntryId ? entry.EntryId : "new"),
+			data: JSON.stringify(formData),
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function () {
+				if (entry.JournalId) location.href = "/journal/" + entry.JournalId;
+				else location.href = "/journal/current"
+			},
+			error: function (request, status, error) {
+				console.error(error);
+				$("#error").show().text(request.responseText);
+			}
+		})
+	})
+	
+	$(".delete-transaction").click(function (e) {
+		var btn = $(this);
+		var row = btn.parent().parent();
+		
+		var accountNumber = +row.attr("id").split(":")[1];
+		entry.transactions = entry.transactions.filter((t) => t.AccountNumber != accountNumber)
+		
+		row.remove();
+		console.log(row);
+	})
+	
+	function onAccountChange(e) {
+		var select = $(e.srcElement);
+		console.log(select);
+	}
+	
+	$("#addTransaction").click(function (e) {
+		
+		var account = accounts[0];
+		if (!account) return;
+		var transaction = {
+			EntryId: entry.EntryId,
+			AccountNumber: account && account.AccountName,
+			Value: 0
+		}
+		
+		var row = $("<tr>");
+		row.addClass("newTransaction");
+		
+		var accountSelector = $("<select>");
+		for (var account of accounts) {			
+			var option = $("<option>");
+			option.val(account.AccountNumber);
+			option.text(account.AccountName + " (#" + account.AccountNumber + ")");
+			if (account.AccountNumber == transaction.AccountNumber) {
+				option.attr("selected", true);
+			}
+			accountSelector.append(option)
+		}
+		row.append($("<td>").append(accountSelector))
+		
+		var debitInput = $("<input>");
+		debitInput.attr("type", "number");
+		debitInput.attr("step", 0.01)
+		debitInput.attr("min", 0)
+		debitInput.attr("class", "debitEntry")
+		debitInput.addClass("form-control");
+		row.append($("<td>").append(debitInput));
+		
+		var creditInput = $("<input>");
+		creditInput.attr("type", "number");
+		creditInput.attr("step", 0.01)
+		creditInput.attr("min", 0)
+		creditInput.attr("class", "creditEntry")
+		creditInput.addClass("form-control");
+		
+		row.append($("<td>").append(creditInput));
+		
+		var deleteRowButton = $('<button class="btn btn-danger btn-xs"><b>X</b></button>');
+		deleteRowButton.click(function () {
+			row.remove()
+		})
+		row.append($('<td class="text-right">').append(deleteRowButton));
+		
+		function render() {
+			if (account.AccountType.IncreaseEntry == "DEBIT") {
+				creditInput.attr("disabled", true);
+				creditInput.val("");
+				debitInput.attr("disabled", false);
+				debitInput.val(0);
+			}
+			else {
+				creditInput.attr("disabled", false);
+				creditInput.val(0);
+				debitInput.attr("disabled", true);
+				debitInput.val("");
+			}
+		}
+		
+		accountSelector.change(function () {
+			var accountNumber = $(accountSelector.children().filter((i, e) => e.selected).get(0)).val();
+			for (var i in accounts) {
+				if (accounts[i].AccountNumber == accountNumber) {
+					account = accounts[i]
+					break;
+				} 
+			}
+			render();
+		})
+		
+		render();
+		$("#transactions tr:last").before(row);
+	})
+</script>
+
+<%- include('partials/footer') %>
