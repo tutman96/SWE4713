@@ -33,6 +33,12 @@
     list-style: none;
 }
 
+.sidebar-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 .sidebar-nav li a {
     background: 0 0;
     padding: 14px 25px;
@@ -49,7 +55,16 @@
 	text-indent: 0;
 }
 
-.sidebar-nav li:hover a {
+
+.sidebar-nav ul a {
+    padding-left: 3em;
+}
+
+.sidebar-nav a[href] {
+    cursor: pointer;
+}
+
+.sidebar-nav li:not(.parent):hover > a {
 	text-decoration: none;
     background-color: #3f485a;
 	text-indent: .25em;

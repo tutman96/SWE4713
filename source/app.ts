@@ -54,6 +54,9 @@ app.use((req, res, next) => {
 import accounts = require('./controllers/accounts');
 accounts(app);
 
+import journals = require('./controllers/journals');
+journals(app);
+
 app.use(serveStatic('.', {
 	maxAge: (process.env.NODE_ENV == 'production' ? 1000 * 60 * 60 * 24 : 0)
 }))

@@ -56,3 +56,10 @@ VALUES
 	(576, 'Expense', 'Telephone Expense', 0.00, 576, 1, '2017-02-09 19:49:42', 0),
 	(610, 'Expense', 'Advertising Expense', 0.00, 610, 1, '2017-02-09 19:49:57', 0),
 	(750, 'Expense', 'Depreciation Expense', 0.00, 750, 1, '2017-02-09 19:50:18', 0);
+
+CREATE TABLE `Journal` (
+  `JournalId` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `Description` text NOT NULL,
+  `Closed` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`JournalId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

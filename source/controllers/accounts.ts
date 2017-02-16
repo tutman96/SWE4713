@@ -8,7 +8,7 @@ export = (app: express.Application) => {
 	app.get("/accounts", wrapper(async (req, res) => {
 		res.render('accounts', {
 			title: "Accounts",
-			accounts: (await Account.find()).sort((a,b) => a.SortOrder - b.SortOrder)
+			accounts: (await Account.find()).sort((a, b) => a.SortOrder - b.SortOrder)
 		})
 	}));
 
@@ -39,7 +39,7 @@ export = (app: express.Application) => {
 			}
 		}
 	}));
-	
+
 	app.post("/account/:AccountNumber", wrapper(async (req, res) => {
 		if (req.params['AccountNumber'] == "new") {
 			var account = await Account.construct(req.body);
@@ -47,14 +47,15 @@ export = (app: express.Application) => {
 		}
 		else {
 			req.body['AccountNumber'] = req.params['AccountNumber'];
-			var account = await Account.construct(req.body);
-			if (!account) {
+			var oldAccount = await Account.findOne({ AccountNumber: req.params['AccountNumber'] });
+			if (!oldAccount) {
 				res.status(404);
 				res.render('404');
+				return;
 			}
-			else {
-				await account.save();
-			}
+			
+			var account = await Account.construct(req.body);
+			await account.save();
 		}
 	}));
 

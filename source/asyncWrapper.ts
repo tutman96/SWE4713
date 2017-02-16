@@ -12,7 +12,7 @@ export = (handler: (req: express.Request, res: express.Response) => Promise<any>
 			if (!res.finished) {
 				if (!res.headersSent) {
 					if (e.code) {
-						res.status(500);
+						res.status(e.code);
 					}
 					else {
 						res.status(500);
@@ -20,6 +20,7 @@ export = (handler: (req: express.Request, res: express.Response) => Promise<any>
 				}
 				res.end(e.toString());
 			}
+			else res.end();
 		}
 	}
 }
