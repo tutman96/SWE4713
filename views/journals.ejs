@@ -12,10 +12,27 @@
 		<tr>
 			<th></th>
 			<th>Description</th>
+			<th>Credits</th>
+			<th>Debits</th>
 			<th></th>
 		</tr>
 	</thead>
 	<% for (var journal of journals) { %>
+		<% 
+			var totalDebits = 0;
+			var totalCredits = 0;
+			
+			for (var entries of journal.entries) {
+				for (var transaction of entries.transactions) {
+					if (transaction.account.AccountType.IncreaseEntry == "CREDIT") {
+						totalCredits += transaction.Value;
+					}
+					else {
+						totalDebits += transaction.Value;
+					}
+				}
+			}
+		%>
 		<tr>
 			<td style="width:100px"><% if (journal.Closed) { %>
 				<div class="label label-success">Closed</div>
@@ -23,6 +40,8 @@
 				<div class="label label-info">Open</div>
 			<% } %></td>
 			<td><%= journal.Description %></td>
+			<td><%= balanceFormat(totalDebits) %></td>
+			<td><%= balanceFormat(totalCredits) %></td>
 			<td>
 				<a class="btn btn-sm btn-link pull-right" href="/journal/<%=journal.JournalId%>">Edit</a>
 			</td>
