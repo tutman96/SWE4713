@@ -37,8 +37,9 @@ app.use((req, res, next) => {
 	res.locals = {
 		title: title,
 		path: req.path,
-		balanceFormat: (balance: number) => "$" + balance.toFixed(2),
-		dateFormat: (date: Date) => moment(date).format('LLL')
+		balanceFormat: (balance: number) => "$" + Math.abs(balance).toFixed(2),
+		dateFormat: (date: Date) => moment(date).format('LLL'),
+		datetimeLocalFormat: (date: Date) => new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().substring(0,19)
 	}
 	
 	var results: any = next();

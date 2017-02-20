@@ -24,6 +24,7 @@
 			</div>
 		</div>
 	</div>
+	<% if (!isNew) { %>
 	<hr>
 	<div class="row">
 		<div class="col-xs-6">
@@ -38,7 +39,6 @@
 			<tr>
 				<th>Date</th>
 				<th>Detail</th>
-				<th>Account</th>
 				<th>Debit</th>
 				<th>Credit</th>
 				<th></th>
@@ -48,7 +48,6 @@
 			<tr>
 				<td rowspan="<%= entry.transactions.length + 1 %>"><%=dateFormat(entry.CreatedDate)%></td>
 				<% for (var i in entry.transactions) { var transaction = entry.transactions[i]; %>
-					<td><%=transaction.account.AccountName%></td>
 					<td><a href="/account/<%=transaction.account.AccountNumber%>"><%=transaction.account.AccountName%></a></td>
 					<td>
 						<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT' && transaction.Value >= 0 || transaction.account.AccountType.IncreaseEntry == 'CREDIT' && transaction.Value < 0) { %>
@@ -61,7 +60,7 @@
 						<% } %>
 					</td>
 					<% if (i == 0) { %>
-						<td rowspan="<%= entry.transactions.length + 1 %>" class="text-right"><a class="btn btn-link" href="/entry/<%=entry.EntryId%>">Edit</a></td>
+						<td rowspan="<%= entry.transactions.length + 1 %>" class="text-right"><a class="btn btn-link" <%- (journal.Closed ? "disabled" : 'href="/entry/' + entry.EntryId + '"') %> >Edit</a></td>
 					<% } %>
 			</tr>
 			<tr>
@@ -69,15 +68,15 @@
 				<td><%=entry.Description%></td>
 				<td></td>
 				<td></td>
-				<td></td>
-				<% if (entry.transactions.length == 0) { %><td rowspan="<%= entry.transactions.length + 1 %>" class="text-right"><a class="btn btn-link" href="/entry/<%=entry.EntryId%>">Edit</a></td><% } %>
+				<% if (entry.transactions.length == 0) { %><td rowspan="<%= entry.transactions.length + 1 %>" class="text-right"><a class="btn btn-link" <%- (journal.Closed ? "disabled" : 'href="/entry/' + entry.EntryId + '"') %> >Edit</a></td><% } %>
 			</tr>
-			<tr><td colspan="6" style="border-top: solid 2px #ddd"></td></tr>
+			<!--<tr><td colspan="6" style="border-top: solid 2px #ddd"></td></tr>-->
 		<% } %>
 		<% if (journal.entries.length == 0) { %>
 			<tr><td colspan="6" class="text-center text-muted">No entries</td></tr>
 		<% } %>
 	</table>
+	<% } %>
 </div>
 
 <script>

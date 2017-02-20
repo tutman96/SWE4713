@@ -16,7 +16,7 @@ class Entry {
 		j.EntryId = props.EntryId;
 		j.JournalId = props.JournalId;
 		j.Description = props.Description;
-		j.CreatedDate = props.CreatedDate;
+		j.CreatedDate = new Date(props.CreatedDate);
 
 		if (props.transactions) {
 			j.transactions = [];
@@ -48,8 +48,8 @@ class Entry {
 	}
 
 	static async create(entry: Entry) {
-		var res = await database.query("INSERT INTO Entry (JournalId, Description) VALUES (?,?)",
-			[entry.JournalId, entry.Description])
+		var res = await database.query("INSERT INTO Entry (JournalId, Description, CreatedDate) VALUES (?,?,?)",
+			[entry.JournalId, entry.Description, entry.CreatedDate])
 
 		for (var transaction of entry.transactions) {
 			transaction.EntryId = res.insertId;
@@ -58,8 +58,8 @@ class Entry {
 	}
 
 	async save() {
-		await database.query("UPDATE Entry SET Description = ? WHERE EntryId = ?",
-			[this.Description, this.EntryId]);
+		await database.query("UPDATE Entry SET Description = ?, CreatedDate = ? WHERE EntryId = ?",
+			[this.Description, this.CreatedDate, this.EntryId]);
 
 		var oldTransactions = await Transaction.find({ EntryId: this.EntryId });
 		

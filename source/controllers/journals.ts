@@ -26,7 +26,9 @@ export = (app: express.Application) => {
 		}
 		else if (req.params['JournalId'] == "current") {
 			var openJournals = await Journal.find({ Closed: false });
+			console.log(openJournals);
 			var journal = openJournals.sort((a, b) => b.JournalId - a.JournalId)[0];
+			console.log(journal);
 			if (!journal) {
 				res.render('journal', {
 					title: "New Journal",
@@ -35,7 +37,8 @@ export = (app: express.Application) => {
 					isEditable: true,
 					canBeOpened: true,
 					journal: {
-						Closed: false
+						Closed: false,
+						entries: []
 					}
 				})
 			}

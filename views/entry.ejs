@@ -10,6 +10,12 @@
 			</div>
 		</div>
 		<div class="form-group">
+			<label class="col-sm-2 control-label">Date</label>
+			<div class="col-sm-10">
+				<input type="datetime-local" class="form-control" name="Date" value="<%=datetimeLocalFormat(entry.CreatedDate || new Date())%>" step="1">
+			</div>
+		</div>
+		<div class="form-group">
 			<label class="col-sm-2 control-label">Transactions</label>
 			<div class="col-sm-10">
 				<table class="table table-condensed" id="transactions">
@@ -59,15 +65,23 @@
 
 	$("#save").click(function () {
 		$("#error").hide();
-
+		
 		var formData = {
 			EntryId: entry.EntryId,
 			JournalId: entry.JournalId,
 			Description: $("input[name=Description]").val(),
+			CreatedDate: new Date(new Date($("input[name=Date]").val()).getTime() + new Date().getTimezoneOffset() * 60 * 1000),
 			transactions: JSON.parse(JSON.stringify(entry.transactions))
 		}
 		
+		if (!formData.Description) {
+			$("#error").show().text("Description must not be empty");
+			return;
+		}
+		
+		var abort = false;
 		$("#transactions tr.newTransaction").each(function (i, r) {
+			if (abort) return;
 			var row = $(r);
 			var accountNumber = +$(row.children('td').children('select').children().filter((i, e) => e.selected).get(0)).val();
 			
@@ -78,12 +92,31 @@
 				}
 			}
 			
+			var creditValue = +$(row.children('td').children('input.creditEntry').get(0)).val();
+			var debitValue = +$(row.children('td').children('input.debitEntry').get(0)).val();
+			console.log(creditValue,debitValue);
+			if (creditValue && debitValue) {
+				$("#error").show().text("Credit and debit provided in new transaction for account " + account.AccountName);
+				abort = true;
+				return;
+			}
+			
 			var value = 0;
 			if (account.AccountType.IncreaseEntry == "CREDIT") {
-				value = +$(row.children('td').children('input.creditEntry').get(0)).val();
+				if (creditValue) {
+					value = creditValue;
+				}
+				else {
+					value = -debitValue;
+				}
 			}
 			else {
-				value = +$(row.children('td').children('input.debitEntry').get(0)).val();
+				if (debitValue) {
+					value = debitValue;
+				}
+				else {
+					value = -creditValue;
+				}
 			}
 			
 			formData.transactions.push({
@@ -92,6 +125,7 @@
 				Value: value
 			})
 		})
+		if (abort) return;
 		
 		var seen = [];
 		var debits = 0;
@@ -115,7 +149,7 @@
 		}
 		
 		if (credits != debits) {
-			$("#error").show().text("Entries are not in balance " + debits + "," + credits);
+			$("#error").show().text("Entries are not in balance. Debits = $" + debits.toFixed(2) + " and Credits = $" + credits.toFixed(2));
 			return;
 		}
 
@@ -183,6 +217,7 @@
 		debitInput.attr("min", 0)
 		debitInput.attr("class", "debitEntry")
 		debitInput.addClass("form-control");
+		debitInput.val("0.00");
 		row.append($("<td>").append(debitInput));
 		
 		var creditInput = $("<input>");
@@ -190,6 +225,7 @@
 		creditInput.attr("step", 0.01)
 		creditInput.attr("min", 0)
 		creditInput.attr("class", "creditEntry")
+		creditInput.val("0.00");
 		creditInput.addClass("form-control");
 		
 		row.append($("<td>").append(creditInput));
@@ -202,16 +238,16 @@
 		
 		function render() {
 			if (account.AccountType.IncreaseEntry == "DEBIT") {
-				creditInput.attr("disabled", true);
-				creditInput.val("");
-				debitInput.attr("disabled", false);
-				debitInput.val(0);
+				debitInput.attr("style","border: 1px solid green");
+				debitInput.attr("title","Increasing Entry");
+				creditInput.attr("style","border: 1px solid red");
+				creditInput.attr("title","Decreasing Entry");
 			}
 			else {
-				creditInput.attr("disabled", false);
-				creditInput.val(0);
-				debitInput.attr("disabled", true);
-				debitInput.val("");
+				creditInput.attr("style","border: 1px solid green");
+				creditInput.attr("title","Increasing Entry");
+				debitInput.attr("style","border: 1px solid red");
+				debitInput.attr("title","Decreasing Entry");
 			}
 		}
 		
