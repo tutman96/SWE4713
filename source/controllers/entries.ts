@@ -19,7 +19,7 @@ export = (app: express.Application) => {
 					JournalId: journal.JournalId,
 					transactions: []
 				},
-				accounts: (await Account.find()).sort((a, b) => a.SortOrder - b.SortOrder)
+				accounts: (await Account.find({ Active: true })).sort((a, b) => a.SortOrder - b.SortOrder)
 			})
 		}
 		else {
@@ -35,7 +35,7 @@ export = (app: express.Application) => {
 				isNew: false,
 				isEditable: false,
 				entry: entry,
-				accounts: (await Account.find()).sort((a, b) => a.SortOrder - b.SortOrder)
+				accounts: (await Account.find({ Active: true })).sort((a, b) => a.SortOrder - b.SortOrder)
 			})
 		}
 	}));
