@@ -25,6 +25,21 @@
 		</div>
 	</div>
 	<% if (!isNew) { %>
+	<%
+		var totalDebits = 0;
+		var totalCredits = 0;
+		
+		for (var entries of journal.entries) {
+			for (var transaction of entries.transactions) {
+				if (transaction.account.AccountType.IncreaseEntry == 'DEBIT' && transaction.Value >= 0 || transaction.account.AccountType.IncreaseEntry == 'CREDIT' && transaction.Value < 0) {
+					totalCredits += Math.abs(transaction.Value);
+				}
+				else {
+					totalDebits += Math.abs(transaction.Value);
+				}
+			}
+		}
+	%>
 	<hr>
 	<div class="row">
 		<div class="col-xs-6">
@@ -39,8 +54,8 @@
 			<tr>
 				<th>Date</th>
 				<th>Detail</th>
-				<th>Debit</th>
-				<th>Credit</th>
+				<th style="text-align:right">Debit</th>
+				<th style="text-align:right">Credit</th>
 				<th></th>
 			</tr>
 		</thead>
@@ -49,12 +64,12 @@
 				<td rowspan="<%= entry.transactions.length + 1 %>"><%=dateFormat(entry.CreatedDate)%></td>
 				<% for (var i in entry.transactions) { var transaction = entry.transactions[i]; %>
 					<td><a href="/account/<%=transaction.account.AccountNumber%>"><%=transaction.account.AccountName%></a></td>
-					<td>
+					<td style="text-align:right">
 						<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT' && transaction.Value >= 0 || transaction.account.AccountType.IncreaseEntry == 'CREDIT' && transaction.Value < 0) { %>
 							<%=balanceFormat(transaction.Value)%>
 							</td><td></td>
 						<% } else { %>
-							</td><td>
+							</td><td style="text-align:right">
 							<%=balanceFormat(transaction.Value)%>
 							</td>
 						<% } %>
@@ -72,6 +87,13 @@
 			</tr>
 			<!--<tr><td colspan="6" style="border-top: solid 2px #ddd"></td></tr>-->
 		<% } %>
+		<tr>
+			<td></td>
+			<td></td>
+			<td style="border-top:4px double #999;text-align:right"><%=balanceFormat(totalCredits)%></td>
+			<td style="border-top:4px double #999;text-align:right"><%=balanceFormat(totalDebits)%></td>
+			<td></td>
+		</tr>
 		<% if (journal.entries.length == 0) { %>
 			<tr><td colspan="6" class="text-center text-muted">No entries</td></tr>
 		<% } %>

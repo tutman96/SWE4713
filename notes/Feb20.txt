@@ -1,0 +1,11 @@
+Add in a search by date system
+Working journal deletes on new post
+The ability to click the entries
+Entries of credit should be indented
+Something about a false button
+Ensure that the money lines up on different number of digits
+Allow only the manager to have access to the POST button/feature
+Allow suport for supporting documents such as PDF or EXCEL
+Make debit a forced first choice on creating journal entries
+Force an automatic input of .00 after entering a money amount
+Ability to click the account and see the entries
