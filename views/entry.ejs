@@ -1,68 +1,99 @@
 <%- include('partials/header') %>
 
 <div class="title">Entry: <%= title %></div>
-<div class="container">
-	<div class="form-horizontal">
-		<div class="form-group">
-			<label class="col-sm-2 control-label">Description</label>
-			<div class="col-sm-10">
-				<input type="text" class="form-control" name="Description" value="<%=entry.Description%>">
-			</div>
+<div class="form-horizontal">
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Description</label>
+		<div class="col-sm-10">
+			<input type="text" class="form-control" name="Description" value="<%=entry.Description%>" <%=(entry.state == "PENDING" ? "" : "disabled")%>>
 		</div>
-		<div class="form-group">
-			<label class="col-sm-2 control-label">Date</label>
-			<div class="col-sm-10">
-				<input type="datetime-local" class="form-control" name="Date" value="<%=datetimeLocalFormat(entry.CreatedDate || new Date())%>" step="1">
-			</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Date</label>
+		<div class="col-sm-10">
+			<input type="datetime-local" class="form-control" name="Date" value="<%=datetimeLocalFormat(entry.CreatedDate || new Date())%>" step="1" <%=(entry.state == "PENDING" ? "" : "disabled")%>>
 		</div>
-		<div class="form-group">
-			<label class="col-sm-2 control-label">Transactions</label>
-			<div class="col-sm-10">
-				<table class="table table-condensed" id="transactions">
-					<thead>
-						<tr>
-							<th>Account</th>
-							<th>Debit</th>
-							<th>Credit</th>
-							<th></th>
-						</tr>
-					</thead>
-					<% for (var transaction of entry.transactions) { %>
-					<tr id="Transaction-Account:<%=transaction.AccountNumber%>">
-						<td><%=transaction.account.AccountName%></td>
-						<td>
-						<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT' && transaction.Value >= 0 || transaction.account.AccountType.IncreaseEntry == 'CREDIT' && transaction.Value <= 0) { %>
-							<%=balanceFormat(transaction.Value)%>
-							</td><td></td>
-						<% } else { %>
-							</td><td>
-							<%=balanceFormat(transaction.Value)%>
-							</td>
-						<% } %>
-						<td class="text-right"><button class="btn btn-danger btn-xs delete-transaction"><b>X</b></button></td>
-					</tr>
-					<% } %>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Status</label>
+		<div class="col-sm-10">
+			<% if (entry.State == "PENDING") { %>
+				<span class="label label-info">Pending</span>
+			<% } else if (entry.State == "APPROVED") { %>
+				<span class="label label-success">Approved</span>
+			<% } else { %>
+				<span class="label label-danger">Declined</span>
+				<br>
+				<span class="text-danger"><%=entry.DeclinedReason%></span>
+			<% } %>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Transactions</label>
+		<div class="col-sm-10">
+			<table class="table table-condensed" id="transactions">
+				<thead>
 					<tr>
-						<td colspan="4" class="text-right">
-							<button id="addTransaction" class="btn btn-success btn-xs"><b>+</b></button>
-						</td>
+						<th>Account</th>
+						<th class="text-right">Debit&nbsp;</th>
+						<th class="text-right">Credit&nbsp;</th>
+						<th></th>
 					</tr>
-				</table>
-			</div>
+				</thead>
+				<% for (var transaction of entry.transactions) { %>
+				<tr id="Transaction-Account:<%=transaction.AccountNumber%>">
+					<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT') { %>
+						<td><a href="/account/<%=transaction.account.AccountNumber%>"><%=transaction.account.AccountName%></a></td>
+					<% } else { %>
+						<td><a href="/account/<%=transaction.account.AccountNumber%>" style="padding-left:2em"><%=transaction.account.AccountName%></a></td>
+					<% } %>
+					<td class="text-right">
+					<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT' && transaction.Value >= 0 || transaction.account.AccountType.IncreaseEntry == 'CREDIT' && transaction.Value <= 0) { %>
+						<%-balanceFormat(Math.abs(transaction.Value))%>
+						</td><td></td>
+					<% } else { %>
+						</td><td class="text-right">
+						<%-balanceFormat(Math.abs(transaction.Value))%>
+						</td>
+					<% } %>
+					<td class="text-right">
+						<% if (entry.State == "PENDING") { %>
+							<button class="btn btn-danger btn-xs delete-transaction"><b>X</b></button>
+						<% } %>
+					</td>
+				</tr>
+				<% } %>
+				<% if (entry.State == "PENDING") { %>
+				<tr>
+					<td colspan="4" class="text-right">
+						<button id="addTransaction" class="btn btn-success btn-xs"><b>+</b></button>
+					</td>
+				</tr>
+				<% } %>
+			</table>
 		</div>
-		<div class="form-group">
-			<div class="alert alert-danger" id="error" style="display:none"></div>
-			<div class="col-sm-offset-2 col-sm-10 text-right">
-				<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
-			</div>
+	</div>
+	<div class="form-group">
+		<div class="alert alert-danger" id="error" style="display:none"></div>
+		<div class="col-sm-offset-2 col-sm-5">
+			<% if (entry.State == "PENDING" && !isNew) { %>
+				<button type="submit" id="approve" class="btn btn-success">Approve</button>
+				<button type="submit" id="decline" class="btn btn-danger">Decline</button>
+			<% } %>
 		</div>
+		<% if (entry.State == "PENDING") { %>
+			<div class="col-sm-5">
+				<button type="submit" id="save" class="btn btn-primary pull-right"><%=(isNew ? "Create" : "Save")%></button>
+			</div>
+		<% } %>
 	</div>
 </div>
 
+<% if (entry.State == "PENDING") { %>
 <script>
 	var entry = <%-JSON.stringify(entry) %>;
 	var accounts = <%-JSON.stringify(accounts) %>;
-
+	
 	$("#save").click(function () {
 		$("#error").hide();
 		
@@ -160,8 +191,7 @@
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			success: function () {
-				if (entry.JournalId) location.href = "/journal/" + entry.JournalId;
-				else location.href = "/journal/current"
+				location.href = "/ledger"
 			},
 			error: function (request, status, error) {
 				console.error(error);
@@ -265,6 +295,48 @@
 		render();
 		$("#transactions tr:last").before(row);
 	})
+	
+	
+	$("#approve").click(function () {
+		if (!confirm("Are you sure you want to approve this entry? This will post it to the accounts and cannot be undone.")) return;
+		
+		$.ajax({
+			method: "POST",
+			url: "/entry/" + entry.EntryId + "/approve",
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function () {
+				location.reload();
+			},
+			error: function (request, status, error) {
+				console.error(error);
+				$("#error").show().text(request.responseText);
+			}			
+		})
+	})
+	
+	$("#decline").click(function () {
+		var p = prompt("Are you sure you want to decline this entry? This cannot be undone.\nPlease give a reason if you wish to continue.");
+		if (!p) return;
+		
+		$.ajax({
+			method: "POST",
+			url: "/entry/" + entry.EntryId + "/decline",
+			data: JSON.stringify({
+				DeclinedReason: p
+			}),
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function () {
+				location.reload();
+			},
+			error: function (request, status, error) {
+				console.error(error);
+				$("#error").show().text(request.responseText);
+			}			
+		})
+	})
 </script>
+<% } %>
 
 <%- include('partials/footer') %>

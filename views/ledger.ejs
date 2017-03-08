@@ -1,0 +1,31 @@
+<%- include('partials/header') %>
+
+<div class="row">
+	<div class="col-xs-6">
+		<span class="title">Ledger</span>
+	</div>
+	<div class="col-xs-6 text-right">
+		<a class="btn btn-primary" href="/entry/new">New Entry</a>
+	</div>
+</div>
+<table class="table table-condensed">
+	<thead>
+		<tr>
+			<th class="col-xs-2">Date</th>
+			<th>Detail</th>
+			<th class="text-right">Debit</th>
+			<th class="text-right">Credit</th>
+			<th class="text-right" style="width:200px">Status</th>
+			<th></th>
+		</tr>
+	</thead>
+	<% for (var entry of entries) { %>
+		<%- include partials/entry %>
+	<% } %>
+	<% if (entries.length == 0) { %>
+		<tr><td colspan="7" class="text-center text-muted">No entries</td></tr>
+	<% } %>
+</table>
+<%- include partials/paginator %>
+
+<%- include('partials/footer') %>

@@ -30,10 +30,14 @@ class Account {
 	}
 
 	private static builder = queryBuilder<Account>("Account")
-	static async find(query: query<Account> = {}) {
-		var sql = this.builder(query);
+	static async find(query: query<Account> = {}, limit?: number, offset?: number) {
+		var sql = this.builder(query, limit, offset);
 		var results = await database.query<any>(sql);
 		return Promise.all(results.map(this.construct))
+	}
+	
+	static async count() {
+		return (await database.query<{ count: number }>("SElECT COUNT(*) as count FROM Account"))[0].count;
 	}
 
 	static async findOne(query: query<Account>) {

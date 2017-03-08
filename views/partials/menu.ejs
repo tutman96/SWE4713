@@ -5,15 +5,7 @@
 	<li <%- (path.indexOf("/account") == 0 ? 'class="active"' : "")%>>
 		<a href="/accounts">Accounts</a>
 	</li>
-	<li class="parent">
-		<a>Journals</a>
-		<ul>
-			<li <%- (path.indexOf("/journal/current") == 0 ? 'class="active"' : "")%>>
-				<a href="/journal/current">Current Journal</a>
-			</li>
-			<li <%- ((path.indexOf("/journal") == 0 && path.indexOf("current") == -1) ? 'class="active"' : "")%>>
-				<a href="/journals">Closed Journals</a>
-			</li>
-		</ul>
+	<li <%- (path.indexOf("/ledger") == 0 ? 'class="active"' : "")%>>
+		<a href="/ledger">Ledger</a>
 	</li>
 </ul>

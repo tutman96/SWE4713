@@ -1,0 +1,65 @@
+<tr>
+	<td rowspan="<%= entry.transactions.length + 1 %>"><%=dateFormat(entry.CreatedDate,'LL')%></td>
+	<% for (var i in entry.transactions) { var transaction = entry.transactions[i]; %>
+		<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT') { %>
+			<td><a href="/account/<%=transaction.account.AccountNumber%>"><%=transaction.account.AccountName%></a></td>
+		<% } else { %>
+			<td><a href="/account/<%=transaction.account.AccountNumber%>" style="padding-left:2em"><%=transaction.account.AccountName%></a></td>
+		<% } %>
+		<td style="text-align:right">
+			<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT' && transaction.Value >= 0 || transaction.account.AccountType.IncreaseEntry == 'CREDIT' && transaction.Value < 0) { %>
+				<%-balanceFormat(Math.abs(transaction.Value))%>
+				</td><td></td>
+			<% } else { %>
+				</td><td style="text-align:right">
+				<%-balanceFormat(Math.abs(transaction.Value))%>
+				</td>
+			<% } %>
+		</td>
+		<% if (i == 0) { %>
+			<td rowspan="<%= entry.transactions.length + 1 %>" class="text-right">
+				<% if (entry.State == "PENDING") { %>
+					<span class="label label-info">Pending</span>
+				<% } else if (entry.State == "APPROVED") { %>
+					<span class="label label-success">Approved</span>
+				<% } else { %>
+					<span class="label label-danger">Declined</span>
+					<br>
+					<span class="text-danger"><%=entry.DeclinedReason%></span>
+				<% } %>
+			</td>
+			<td rowspan="<%= entry.transactions.length + 1 %>" class="text-right">
+				<a class="btn btn-link" href="/entry/<%=entry.EntryId%>">Edit</a>
+			</td>
+		<% } %>
+</tr>
+<tr>
+	<% } %>
+	<td><%=entry.Description%></td>
+	<td></td>
+	<td></td>
+	<% if (entry.transactions.length == 0) { %>
+		<td rowspan="<%= entry.transactions.length + 1 %>" class="text-right">
+			<% if (entry.State == "PENDING") { %>
+				<span class="label label-info">Pending</span>
+			<% } else if (entry.State == "APPROVED") { %>
+				<span class="label label-success">Approved</span>
+			<% } else { %>
+				<span class="label label-danger">Declined</span>
+				<br>
+				<span class="text-danger"><%=entry.DeclinedReason%></span>
+			<% } %>
+		</td>
+		<td rowspan="<%= entry.transactions.length + 1 %>" class="text-right">
+			<a class="btn btn-link" href="/entry/<%=entry.EntryId%>">Edit</a>
+		</td>
+	<% } %>
+</tr>
+<tr style="margin-bottom: 1em">
+	<td></td>
+	<td></td>
+	<td style="border-bottom:4px double #999;border-top:1px solid #999;text-align:right"><%-balanceFormat(entry.totalCredits)%></td>
+	<td style="border-bottom:4px double #999;border-top:1px solid #999;text-align:right"><%-balanceFormat(entry.totalDebits)%></td>
+	<td></td>
+	<td></td>
+</tr>

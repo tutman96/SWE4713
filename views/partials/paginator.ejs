@@ -1,0 +1,9 @@
+<nav>
+	<ul class="pager">
+		<% if (page > 1) { %><li class="previous"><a href="<%=path%>?page=<%=page - 1%>">&larr; Previous Page</a></li><% } %>
+		<% if (page == 1) { %><li class="previous disabled"><a>&larr; Previous Page</a></li><% } %>
+		<li style="line-height: 35px;">Page <%=page%> of <%=totalPages%></li>
+		<% if (page < totalPages) { %><li class="next"><a href="<%=path%>?page=<%=page + 1%>">Next Page &rarr;</a></li><% } %>
+		<% if (page == totalPages) { %><li class="next disabled"><a>Next Page &rarr;</a></li><% } %>
+	</ul>
+</nav>

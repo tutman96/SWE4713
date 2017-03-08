@@ -14,7 +14,7 @@
 			<th>Account Number</th>
 			<th>Account Type</th>
 			<th>Account Name</th>
-			<th>Initial Balance</th>
+			<th class="text-right" style="padding-right:1em">Balance&nbsp;</th>
 			<th>Created Time</th>
 			<th></th>
 		</tr>
@@ -29,7 +29,7 @@
 			<td><%= account.AccountNumber %></td>
 			<td><%= account.AccountType.AccountType %></td>
 			<td><%= account.AccountName %></td>
-			<td style="text-align:right;padding-right:1em"><%= balanceFormat(account.InitialBalance) %></td>
+			<td style="text-align:right;padding-right:1em"><%- balanceFormat(account.balance) %></td>
 			<td><%= dateFormat(account.CreatedTime) %></td>
 			<td>
 				<a class="btn btn-sm btn-link pull-right" href="/account/<%=account.AccountNumber%>">Edit</a>
@@ -37,5 +37,5 @@
 		</tr>
 	<% } %>
 </table>
-
+<%- include partials/paginator %>
 <%- include('partials/footer') %>

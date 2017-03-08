@@ -1,22 +1,19 @@
 import express = require('express');
-import wrapper = require('../asyncWrapper');
+import helpers = require('../helpers');
 
-import Journal = require("../models/Journal");
 import Entry = require("../models/Entry");
 import Account = require("../models/Account");
 
 export = (app: express.Application) => {
-	app.get("/entry/:EntryId", wrapper(async (req, res) => {
+	app.get("/entry/:EntryId", helpers.wrap(async (req, res) => {
 		if (req.params['EntryId'] == "new") {
-			var openJournals = await Journal.find({ Closed: false });
-			var journal = openJournals.sort((a, b) => b.JournalId - a.JournalId)[0];
-
-			res.render('entry', {
-				title: "New Entry for " + journal.Description,
+			return helpers.render(res, 'entry', {
+				title: "New Journal Entry",
 				isNew: true,
 				isEditable: true,
 				entry: {
-					JournalId: journal.JournalId,
+					Description: "",
+					State: "PENDING",
 					transactions: []
 				},
 				accounts: (await Account.find({ Active: true })).sort((a, b) => a.SortOrder - b.SortOrder)
@@ -25,12 +22,10 @@ export = (app: express.Application) => {
 		else {
 			var entry = await Entry.findOne({ EntryId: req.params['EntryId'] });
 			if (!entry) {
-				res.status(404)
-				res.render('404')
-				return;
+				return helpers.render(res, '404')
 			}
 
-			res.render('entry', {
+			return helpers.render(res, 'entry', {
 				title: entry.Description,
 				isNew: false,
 				isEditable: false,
@@ -40,7 +35,7 @@ export = (app: express.Application) => {
 		}
 	}));
 
-	app.post("/entry/:EntryId", wrapper(async (req, res) => {
+	app.post("/entry/:EntryId", helpers.wrap(async (req, res) => {
 		if (req.params['EntryId'] == "new") {
 			var entry = await Entry.construct(req.body);
 			await Entry.create(entry);
@@ -48,13 +43,32 @@ export = (app: express.Application) => {
 		else {
 			var oldEntry = await Entry.findOne({ EntryId: req.params.EntryId });
 			if (!oldEntry) {
-				res.status(404);
-				res.render('404');
-				return;
+				return helpers.render(res, '404');
 			}
 			req.body.EntryId = req.params.EntryId
 			var entry = await Entry.construct(req.body);
 			await entry.save();
 		}
+	}))
+
+	app.post("/entry/:EntryId/approve", helpers.wrap(async (req, res) => {
+		var entry = await Entry.findOne({ EntryId: req.params['EntryId'] });
+		if (!entry) {
+			return helpers.render(res, '404');
+		}
+		if (entry.State != "PENDING") return;
+		entry.State = "APPROVED";
+		await entry.save();
+	}))
+
+	app.post("/entry/:EntryId/decline", helpers.wrap(async (req, res) => {
+		var entry = await Entry.findOne({ EntryId: req.params['EntryId'] });
+		if (!entry) {
+			return helpers.render(res, '404');
+		}
+		if (entry.State != "PENDING") return;
+		entry.State = "DECLINED";
+		entry.DeclinedReason = req.body['DeclinedReason'];
+		await entry.save();
 	}))
 }

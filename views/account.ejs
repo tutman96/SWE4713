@@ -1,63 +1,81 @@
 <%- include('partials/header') %>
 
-<span class="title">Account: <%= title %></span>
-<div class="container">
-	<div class="form-horizontal">
-		<div class="form-group">
-			<label class="col-sm-2 control-label">Account Number</label>
-			<div class="col-sm-10">
-				<input type="number" class="form-control" name="AccountNumber" value="<%=account.AccountNumber%>" <%=!isNew ? "readonly" : ""%>>
-			</div>
+<div class="title">Account: <%= title %></div>
+<div class="form-horizontal">
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Account Number</label>
+		<div class="col-sm-10">
+			<input type="number" class="form-control" name="AccountNumber" value="<%=account.AccountNumber%>" <%=!isNew ? "readonly" : ""%>>
 		</div>
-		<div class="form-group">
-			<label class="col-sm-2 control-label">Account Name</label>
-			<div class="col-sm-10">
-				<input type="text" class="form-control" name="AccountName" value="<%=account.AccountName%>">
-			</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Account Name</label>
+		<div class="col-sm-10">
+			<input type="text" class="form-control" name="AccountName" value="<%=account.AccountName%>">
 		</div>
-		<div class="form-group">
-			<label for="inputAccountNumber" class="col-sm-2 control-label">Account Type</label>
-			<div class="col-sm-10">
-				<select class="form-control" name="AccountType">
-					<% for (var accountType of accountTypes) { %>
-						<option value="<%=accountType.AccountType%>" <%-account.AccountType && (account.AccountType.AccountType == accountType.AccountType ? "selected" : "")%>>
-							<%=accountType.AccountType%> (#<%=accountType.MinCode%> - <%=accountType.MaxCode%>)
-						</option>
-					<% } %>
-				</select>
-			</div>
+	</div>
+	<div class="form-group">
+		<label for="inputAccountNumber" class="col-sm-2 control-label">Account Type</label>
+		<div class="col-sm-10">
+			<select class="form-control" name="AccountType">
+				<% for (var accountType of accountTypes) { %>
+					<option value="<%=accountType.AccountType%>" <%-account.AccountType && (account.AccountType.AccountType == accountType.AccountType ? "selected" : "")%>>
+						<%=accountType.AccountType%> (#<%=accountType.MinCode%> - <%=accountType.MaxCode%>)
+					</option>
+				<% } %>
+			</select>
 		</div>
-		<div class="form-group">
-			<label class="col-sm-2 control-label">Initial Balance</label>
-			<div class="col-sm-10">
-				<div class="input-group">
-					<span class="input-group-addon">$</span>
-					<input type="number" class="form-control" name="InitialBalance" value="<%=account.InitialBalance || "0.00"%>" step="0.01">
-				</div>
-			</div>
-		</div>
-		<div class="form-group">
-			<label class="col-sm-2 control-label">Sort Order</label>
-			<div class="col-sm-10">
-				<input type="number" class="form-control" name="SortOrder" value="<%=account.SortOrder || 0%>">
-			</div>
-		</div>
-		<div class="form-group">
-			<label class="col-sm-2 control-label">Active</label>
-			<div class="col-sm-10">
-				<input type="checkbox" class="form-control" name="Active" <%=(account.Active ? 'checked' : '')%>>
-			</div>
-		</div>
-		
-		<div class="form-group">
-			<div class="alert alert-danger" id="error" style="display:none"></div>
-			<div class="col-sm-offset-2 col-sm-10 text-right">
-				<% if (!isNew) { %><button id="delete" class="btn btn-danger pull-left">Delete</button><% } %>
-				<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Initial Balance</label>
+		<div class="col-sm-10">
+			<div class="input-group">
+				<span class="input-group-addon">$</span>
+				<input type="number" class="form-control" name="InitialBalance" value="<%=account.InitialBalance || "0.00"%>" step="0.01">
 			</div>
 		</div>
 	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Sort Order</label>
+		<div class="col-sm-10">
+			<input type="number" class="form-control" name="SortOrder" value="<%=account.SortOrder || 0%>">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Active</label>
+		<div class="col-sm-10">
+			<input type="checkbox" class="form-control" name="Active" <%=(account.Active ? 'checked' : '')%>>
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<div class="alert alert-danger" id="error" style="display:none"></div>
+		<div class="col-sm-offset-2 col-sm-10 text-right">
+			<% if (!isNew) { %><button id="delete" class="btn btn-danger pull-left">Delete</button><% } %>
+			<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
+		</div>
+	</div>
 </div>
+<hr>
+<% if (!isNew) { %>
+	<span class="title">Transactions</span>
+	<table class="table table-condensed">
+		<thead>
+			<tr>
+				<th>Date</th>
+				<th>Entry</th>
+				<th class="text-right">Value</th>
+			</tr>
+		</thead>
+		<% for (var transaction of transactions) { %>
+			<tr>
+				<td><%=dateFormat(transaction.CreatedDate,'LL')%></td>
+				<td><a href="/entry/<%=transaction.EntryId%>"><%=transaction.Description%></a></td>
+				<td class="text-right"><%-balanceFormat(transaction.Value)%></td>
+			</tr>
+		<% } %>
+	</table>
+<% } %>
 
 <script>
 	var accountTypes = <%-JSON.stringify(accountTypes)%>;

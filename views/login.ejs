@@ -1,7 +1,79 @@
-<%- include('partials/header') %>
+<!DOCTYPE html>
 
-<h1>Hello world!</h1>
-<h2><small>The time is now <%=new Date().toString()%></small></h2>
-<%=JSON.stringify(user)%>
+<head>
+	<title>SWE4713 Login</title>
+	<link rel="stylesheet" href="bower_components/bootstrap-css-only/css/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/app.css">
+	<script src="bower_components/jquery/dist/jquery.min.js"></script>
+	<style>
+		.panel {
+			max-width: 400px;
+			margin: 15vh auto 0;
+		}
+	</style>
+</head>
 
-<%- include('partials/footer') %>
+<body>
+	<div class="container-fluid">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<center>
+					<h2>SWE4713 Double Entry Accouting</h2>
+					<h4 class="text-muted">Please login</h4>
+				</center>
+				<div class="form-group">
+					<label class="control-label">Username</label>
+					<input type="text" class="form-control" id="username">
+				</div>
+				<div class="form-group">
+					<label class="control-label">Password</label>
+					<input type="password" class="form-control" id="password">
+				</div>
+				<div class="alert alert-danger" style="display:none" id="error"></div>
+				<button class="btn btn-primary btn-block" id="login">Login</button>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		if (location.search.indexOf('?m=') == 0) {
+			var text = decodeURIComponent(location.search.substr(3));
+			$("#error").text(text).show();
+		}
+	
+		$("#username, #password").keydown(function (e) {
+			if (e.keyCode == 13) $("#login").click()
+		})
+		$("#login").click(function () {
+			$("#error").hide();
+			
+			var username = $("#username").val();
+			var password = $("#password").val();
+			
+			if (!username) {
+				return $("#error").text("Please enter your username").show();
+			}
+			
+			if (!password) {
+				return $("#error").text("Please enter your password").show();
+			}
+			
+			$.ajax({
+				method: "POST",
+				url: "/login",
+				data: JSON.stringify({
+					username: username,
+					password: password
+				}),
+				contentType: "application/json",
+				dataType: "json",
+				success: function () {
+					location.href = "/";
+				},
+				error: function (response) {
+					$("#error").text(response.responseText).show();
+				}
+			})
+		})
+	</script>
+</body>

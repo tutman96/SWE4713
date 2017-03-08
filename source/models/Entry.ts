@@ -5,18 +5,20 @@ import Transaction = require('./Transaction');
 
 class Entry {
 	EntryId: number;
-	JournalId: number;
 	Description: string;
 	CreatedDate: Date;
+	State: "PENDING" | "APPROVED" | "DECLINED";
+	DeclinedReason: string;
 
 	transactions?: Array<Transaction>;
 
 	static async construct(props: {[K in keyof Entry]: Entry[K]}) {
 		var j = new Entry();
 		j.EntryId = props.EntryId;
-		j.JournalId = props.JournalId;
+		j.State = props.State || "PENDING";
 		j.Description = props.Description;
 		j.CreatedDate = new Date(props.CreatedDate);
+		j.DeclinedReason = props.DeclinedReason;
 
 		if (props.transactions) {
 			j.transactions = [];
@@ -35,10 +37,14 @@ class Entry {
 	}
 
 	private static builder = queryBuilder<Entry>("Entry")
-	static async find(query: query<Entry> = {}) {
-		var sql = this.builder(query);
+	static async find(query: query<Entry> = {}, limit?: number, offset?: number) {
+		var sql = this.builder(query, limit, offset);
 		var results = await database.query<any>(sql);
 		return Promise.all(results.map(this.construct))
+	}
+
+	static async count() {
+		return (await database.query<{ count: number }>("SElECT COUNT(*) as count FROM Entry"))[0].count;
 	}
 
 	static async findOne(query: query<Entry>) {
@@ -48,8 +54,8 @@ class Entry {
 	}
 
 	static async create(entry: Entry) {
-		var res = await database.query("INSERT INTO Entry (JournalId, Description, CreatedDate) VALUES (?,?,?)",
-			[entry.JournalId, entry.Description, entry.CreatedDate])
+		var res = await database.query("INSERT INTO Entry (Description, CreatedDate, State) VALUES (?,?,?)",
+			[entry.Description, entry.CreatedDate, "PENDING"])
 
 		for (var transaction of entry.transactions) {
 			transaction.EntryId = res.insertId;
@@ -58,11 +64,11 @@ class Entry {
 	}
 
 	async save() {
-		await database.query("UPDATE Entry SET Description = ?, CreatedDate = ? WHERE EntryId = ?",
-			[this.Description, this.CreatedDate, this.EntryId]);
+		await database.query("UPDATE Entry SET Description = ?, CreatedDate = ?, State = ?, DeclinedReason = ? WHERE EntryId = ?",
+			[this.Description, this.CreatedDate, this.State, this.DeclinedReason, this.EntryId]);
 
 		var oldTransactions = await Transaction.find({ EntryId: this.EntryId });
-		
+
 		for (var t of this.transactions) {
 			var found = false;
 			for (var t2 of oldTransactions) {
@@ -76,7 +82,7 @@ class Entry {
 				await Transaction.create(t);
 			}
 		}
-		
+
 		for (var t of oldTransactions) {
 			var found = false;
 			for (var t2 of this.transactions) {
@@ -92,7 +98,7 @@ class Entry {
 	}
 
 	async delete() {
-		await database.query("DELETE FROM Journal WHERE JournalId = ?", [this.EntryId])
+		await database.query("DELETE FROM Entry WHERE EntryId = ?", [this.EntryId])
 		for (var transaction of this.transactions) {
 			await transaction.delete();
 		}

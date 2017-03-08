@@ -2,6 +2,7 @@ import database = require('../database');
 import { default as queryBuilder, query } from '../querybuilder';
 
 import Account = require('./Account');
+import Entry = require('./Entry');
 
 class Transaction {
 	EntryId: number;
@@ -47,7 +48,7 @@ class Transaction {
 	async delete() {
 		await database.query("DELETE FROM Transaction WHERE EntryId = ? AND AccountNumber = ?", [this.EntryId, this.AccountNumber])
 	}
-	
+
 	equals(transaction: Transaction) {
 		return this.AccountNumber == transaction.AccountNumber && this.EntryId == transaction.EntryId
 	}
