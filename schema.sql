@@ -66,8 +66,18 @@ CREATE TABLE `Journal` (
 
 CREATE TABLE `Entry` (
   `EntryId` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `JournalId` int(11) NOT NULL,
   `Description` text NOT NULL,
   `CreatedDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `State` varchar(255) DEFAULT NULL,
+  `DeclinedReason` text,
   PRIMARY KEY (`EntryId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `Employee` (
+  `EmployeeId` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `Username` varchar(255) NOT NULL DEFAULT '',
+  `PassHash` varchar(255) NOT NULL DEFAULT '',
+  `Permissions` text NOT NULL,
+  `Disabled` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`EmployeeId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
