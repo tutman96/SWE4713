@@ -3,6 +3,8 @@ import { default as queryBuilder, query } from '../querybuilder';
 
 import Account = require('./Account');
 
+//3 users ()
+
 class Employee {
 	EmployeeId: number;
 	Username: string;

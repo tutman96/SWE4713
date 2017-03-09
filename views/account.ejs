@@ -51,7 +51,6 @@
 	<div class="form-group">
 		<div class="alert alert-danger" id="error" style="display:none"></div>
 		<div class="col-sm-offset-2 col-sm-10 text-right">
-			<% if (!isNew) { %><button id="delete" class="btn btn-danger pull-left">Delete</button><% } %>
 			<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
 		</div>
 	</div>
@@ -72,6 +71,11 @@
 				<td><%=dateFormat(transaction.CreatedDate,'LL')%></td>
 				<td><a href="/entry/<%=transaction.EntryId%>"><%=transaction.Description%></a></td>
 				<td class="text-right"><%-balanceFormat(transaction.Value)%></td>
+			</tr>
+		<% } %>
+		<% if (transactions.length == 0) { %>
+			<tr>
+				<td colspan="3" class="text-center text-muted">No Entries</td>
 			</tr>
 		<% } %>
 	</table>

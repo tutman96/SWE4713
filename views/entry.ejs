@@ -5,13 +5,13 @@
 	<div class="form-group">
 		<label class="col-sm-2 control-label">Description</label>
 		<div class="col-sm-10">
-			<input type="text" class="form-control" name="Description" value="<%=entry.Description%>" <%=(entry.state == "PENDING" ? "" : "disabled")%>>
+			<input type="text" class="form-control" name="Description" value="<%=entry.Description%>" <%=(entry.State == "PENDING" ? "" : "disabled")%>>
 		</div>
 	</div>
 	<div class="form-group">
 		<label class="col-sm-2 control-label">Date</label>
 		<div class="col-sm-10">
-			<input type="datetime-local" class="form-control" name="Date" value="<%=datetimeLocalFormat(entry.CreatedDate || new Date())%>" step="1" <%=(entry.state == "PENDING" ? "" : "disabled")%>>
+			<input type="datetime-local" class="form-control" name="Date" value="<%=datetimeLocalFormat(entry.CreatedDate || new Date())%>" step="1" <%=(entry.State == "PENDING" ? "" : "disabled")%>>
 		</div>
 	</div>
 	<div class="form-group">
@@ -249,6 +249,9 @@
 		debitInput.addClass("form-control");
 		debitInput.val("0.00");
 		row.append($("<td>").append(debitInput));
+		debitInput.on("blur", function() {
+			debitInput.val((+debitInput.val()).toFixed(2));
+		})
 		
 		var creditInput = $("<input>");
 		creditInput.attr("type", "number");
@@ -257,6 +260,9 @@
 		creditInput.attr("class", "creditEntry")
 		creditInput.val("0.00");
 		creditInput.addClass("form-control");
+		creditInput.on("blur", function() {
+			creditInput.val((+creditInput.val()).toFixed(2));
+		})
 		
 		row.append($("<td>").append(creditInput));
 		

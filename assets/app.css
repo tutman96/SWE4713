@@ -90,6 +90,10 @@
     text-align: center;
 }
 
+.sidebar-nav hr {
+    border: 1px solid #535e6e;
+}
+
 #wrapper {
 	padding-left: 250px;
 }
