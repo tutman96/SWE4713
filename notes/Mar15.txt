@@ -1,0 +1,7 @@
+√ Fix status errors
+Create event log
+√ Ledger is per account
+click only once to post
+√ No save on account page
+√ trial balance errors if an account has 0 balance do not show it
+file upload on the creation of the entry

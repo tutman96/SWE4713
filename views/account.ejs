@@ -45,7 +45,9 @@
 			<button type="submit" class="btn btn-default" onclick="history.back()">Back</button>
 		</div>
 		<div class="col-sm-6 text-right">
+			<% if (isNew || !transactions.length) { %>
 			<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
+			<% } %>
 		</div>
 	</div>
 </div>

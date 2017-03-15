@@ -14,14 +14,14 @@ export = (app: express.Application) => {
 		var endDate = (req.query['endDate'] ? new Date(req.query['endDate']) : new Date(year, month + 1, 0));
 
 		var balances = await database.query<{ AccountNumber: number, AccountName: string, IncreaseEntry: "CREDIT" | "DEBIT", Value: number }>(`
-		SELECT AccountNumber, AccountName, IncreaseEntry, COALESCE(SUM(Value),0) as Value FROM Account 
-			LEFT JOIN Transaction USING (AccountNumber) 
-			LEFT JOIN Entry USING (EntryId)
+		SELECT AccountNumber, AccountName, IncreaseEntry, SUM(Value) as Value FROM Account 
+			JOIN Transaction USING (AccountNumber) 
+			JOIN Entry USING (EntryId)
 			JOIN AccountType USING (AccountType)
   			WHERE 
-				((CreatedDate BETWEEN ? AND ?) OR CreatedDate IS NULL) AND 
-				(State = "APPROVED" OR State IS NULL) AND
-				(Account.Active = 1)
+				(CreatedDate BETWEEN ? AND ?) AND 
+				State = "APPROVED" AND
+				Account.Active = 1
 			GROUP BY AccountNumber 
 			ORDER BY IncreaseEntry DESC, SortOrder ASC`, [startDate, endDate])
 		
@@ -52,9 +52,10 @@ export = (app: express.Application) => {
 			LEFT JOIN Entry USING (EntryId)
 			JOIN AccountType USING (AccountType)
   			WHERE 
-				((CreatedDate BETWEEN ? AND ?) OR CreatedDate IS NULL) AND 
-				(State = "APPROVED" OR State IS NULL) AND
-				(Account.Active = 1) AND (AccountType.AccountType = 'Expense' OR AccountType.AccountType = 'Revenue')
+				CreatedDate BETWEEN ? AND ? AND 
+				State = "APPROVED" AND
+				Account.Active = 1 AND 
+				(AccountType.AccountType = 'Expense' OR AccountType.AccountType = 'Revenue')
 			GROUP BY AccountNumber 
 			ORDER BY IncreaseEntry DESC, SortOrder ASC`, [startDate, endDate])
 		

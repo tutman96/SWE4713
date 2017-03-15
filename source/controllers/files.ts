@@ -17,13 +17,17 @@ export = (app: express.Application) => {
 		res.header('content-length', file.Size.toString());
 
 		await new Promise((resolve, reject) => {
-			var stream = fs.createReadStream(file.Path).pipe(res);
-			stream.on("error", (err) => {
-				console.error(err);
-				reject(err);
-			})
-			stream.on("close", () => {
-				resolve();
+			fs.exists(file.Path, (exists) => {
+				if (!exists) return reject("File not found");
+				
+				var stream = fs.createReadStream(file.Path).pipe(res);
+				stream.on("error", (err) => {
+					console.error(err);
+					reject(err);
+				})
+				stream.on("close", () => {
+					resolve();
+				})
 			})
 		})
 	}))
@@ -33,7 +37,7 @@ export = (app: express.Application) => {
 		if (req.params['FileId'] == "new") {
 			var file = await File.construct({ EntryId: req.query['EntryId'] } as File);
 			var f = req.files.file;
-			
+
 			file.Filename = f.name;
 			file.MimeType = f.mimetype;
 			file.Size = f.data.byteLength;

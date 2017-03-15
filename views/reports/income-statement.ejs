@@ -7,10 +7,10 @@
 	<table class="table table-striped table-condensed">
 		<thead>
 			<tr>
-				<th colspan="3">Revenues</th>
+				<th colspan="2">Revenues</th>
 			</tr>
 		</thead>
-		<% var firstAccountDollarSign = true, firstTotalDollarSign = true, totalRevenue = 0; %>
+		<% var firstAccountDollarSign = true, totalRevenue = 0; %>
 		<% for (var balance of revenues) { totalRevenue += balance.Value %>
 			<tr>
 				<td><a href="/account/<%=balance.AccountNumber%>"><%=balance.AccountName%></a></td>
@@ -22,22 +22,14 @@
 						<%-balanceFormat(balance.Value).replace("$","")%>
 					<% } %>
 				</td>
-				<td class="text-right">
-					<% if (firstTotalDollarSign) { %>
-						<%-balanceFormat(totalRevenue)%>
-						<% firstTotalDollarSign = false %>
-					<% } else { %>
-						<%-balanceFormat(totalRevenue).replace("$","")%>
-					<% } %>
-				</td>
 			</tr>
 		<% } %>
 		<tr>
-			<th colspan="2">Total Revenues</th>
+			<th>Total Revenues</th>
 			<th class="text-right" style="border-bottom:4px double #999;border-top:1px solid #999">
-				<% if (firstTotalDollarSign) { %>
+				<% if (firstAccountDollarSign) { %>
 					<%-balanceFormat(totalRevenue)%>
-					<% firstTotalDollarSign = false %>
+					<% firstAccountDollarSign = false %>
 				<% } else { %>
 					<%-balanceFormat(totalRevenue).replace("$","")%>
 				<% } %>
@@ -52,7 +44,7 @@
 				<th colspan="3">Expenses</th>
 			</tr>
 		</thead>
-		<% var firstAccountDollarSign = true, firstTotalDollarSign = true, totalExpense = 0; %>
+		<% var firstAccountDollarSign = true, totalExpense = 0; %>
 		<% for (var balance of expenses) { totalExpense += balance.Value %>
 			<tr>
 				<td><a href="/account/<%=balance.AccountNumber%>"><%=balance.AccountName%></a></td>
@@ -64,22 +56,14 @@
 						<%-balanceFormat(balance.Value).replace("$","")%>
 					<% } %>
 				</td>
-				<td class="text-right">
-					<% if (firstTotalDollarSign) { %>
-						<%-balanceFormat(totalExpense)%>
-						<% firstTotalDollarSign = false %>
-					<% } else { %>
-						<%-balanceFormat(totalExpense).replace("$","")%>
-					<% } %>
-				</td>
 			</tr>
 		<% } %>
 		<tr>
-			<th colspan="2">Total Expenses</th>
+			<th>Total Expenses</th>
 			<th class="text-right" style="border-bottom:4px double #999;border-top:1px solid #999">
-				<% if (firstTotalDollarSign) { %>
+				<% if (firstAccountDollarSign) { %>
 					<%-balanceFormat(totalExpense)%>
-					<% firstTotalDollarSign = false %>
+					<% firstAccountDollarSign = false %>
 				<% } else { %>
 					<%-balanceFormat(totalExpense).replace("$","")%>
 				<% } %>
