@@ -8,6 +8,11 @@
 	<li <%- (path.indexOf("/ledger") == 0 ? 'class="active"' : "")%>>
 		<a href="/ledger">Ledger</a>
 	</li>
+	<% if (user.permissions['employee.edit']) { %>
+	<li <%- (path.indexOf("/employee") == 0 ? 'class="active"' : "")%>>
+		<a href="/employees">Employees</a>
+	</li>
+	<% } %>
 	<hr>
 	<li>
 		<a href="/logout">Logout</a>

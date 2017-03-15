@@ -1,0 +1,147 @@
+<%- include('partials/header') %>
+<style>
+	.permission { 
+		font-weight: normal 
+	}
+</style>
+<div class="title">Employee: <%= title %></div>
+<div class="form-horizontal">
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Username</label>
+		<div class="col-sm-10">
+			<input type="text" class="form-control" name="Username" value="<%=employee.Username%>" <%=!isNew ? "readonly" : ""%>>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Password</label>
+		<div class="col-sm-10">
+			<input type="password" class="form-control" name="Password" autocomplete="off">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Permissions</label>
+		<div class="col-sm-10">
+			<% for (var permission of allPermissions) { %>
+				<label class="control-label permission">
+					<input type="checkbox" id="permission:<%-permission%>" <%=(employee.Permissions[permission] ? "checked" : "")%>>
+					<%=permission%>
+				</label>
+				<br>
+			<% } %>
+		</div>
+	</div>	
+	<div class="form-group">
+		<div class="alert alert-danger" id="error" style="display:none"></div>
+		<div class="col-sm-2">
+			<button type="submit" class="btn btn-default" onclick="history.back()">Back</button>
+		</div>
+		<div class="col-sm-10 text-right">
+			<% if (!isNew && !employee.Disabled) { %><button id="disable" class="btn btn-danger pull-left">Disable</button> <% } %>
+			<% if (!isNew && employee.Disabled) { %><button id="enable" class="btn btn-success pull-left">Enable</button> <% } %>
+			<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
+		</div>
+	</div>
+</div>
+
+<script>
+	var employee = <%-JSON.stringify(employee)%>;
+	var passwordText = "haha, you thought you could get my password";
+	$("input[name=Password]").val(passwordText);
+	
+	function deepEquals( x, y ) {
+		if ( x === y ) return true;
+		if ( ! ( x instanceof Object ) || ! ( y instanceof Object ) ) return false;
+
+		if ( x.constructor !== y.constructor ) return false;
+
+		for ( var p in x ) {
+			if ( ! x.hasOwnProperty( p ) ) continue;
+			if ( ! y.hasOwnProperty( p ) ) return false;
+
+			if ( x[ p ] === y[ p ] ) continue;
+
+			if ( typeof( x[ p ] ) !== "object" ) return false;
+
+			if ( ! Object.equals( x[ p ],  y[ p ] ) ) return false;
+		}
+
+		for ( p in y ) {
+			if ( y.hasOwnProperty( p ) && ! x.hasOwnProperty( p ) ) return false;
+		}
+		return true;
+	}
+	
+	$("#save").click(function () {
+		$("#error").hide();
+
+		var formData = {
+			Username: $("input[name=Username]").val(),
+			Permissions: {},
+			Password: $("input[name=Password]").val()
+		}
+		if (formData.Password == passwordText) delete formData.Password; //don't update it
+		
+		$(".permission input").each(function (i, e) {
+			var elem = $(e);
+			formData.Permissions[elem.attr("id").substr("permission:".length)] = elem.is(':checked');
+		})
+		
+		if (employee.EmployeeId && !deepEquals(formData.Permissions, employee.Permissions) && !confirm("Note: by changing the permissions, the user will have to log out and log back in for the changes to take effect.")) {
+			return;
+		}
+
+		$.ajax({
+			method: "POST",
+			url: "/employee/" + (employee.EmployeeId || "new"),
+			data: JSON.stringify(formData),
+			contentType: "application/json",
+			dataType: "json",
+			success: function () {
+				location.href = "/employees";
+			},
+			error: function (response) {
+				$("#error").text(response.responseText).show();
+			}
+		})
+	})
+	
+	$("#disable").click(function () {
+		$("#error").hide();
+		
+		if (!confirm("Are you sure you want to disable this user?")) {
+			return;
+		}
+		
+		$.ajax({
+			method: "POST",
+			url: "/employee/" + employee.EmployeeId + "/disable",
+			success: function () {
+				location.href = "/employees";
+			},
+			error: function (response) {
+				$("#error").text(response.responseText).show();
+			}
+		})
+	})
+	
+	$("#enable").click(function () {
+		$("#error").hide();
+		
+		if (!confirm("Are you sure you want to enable this user?")) {
+			return;
+		}
+		
+		$.ajax({
+			method: "POST",
+			url: "/employee/" + employee.EmployeeId + "/enable",
+			success: function () {
+				location.href = "/employees";
+			},
+			error: function (response) {
+				$("#error").text(response.responseText).show();
+			}
+		})
+	})
+</script>
+
+<%- include('partials/footer') %>

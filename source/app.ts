@@ -110,6 +110,9 @@ entries(app);
 import files = require('./controllers/files');
 files(app);
 
+import employees = require('./controllers/employees');
+employees(app);
+
 app.use((req, res) => {
 	res.status(404);
 	res.render("404");

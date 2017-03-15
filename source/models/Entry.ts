@@ -69,7 +69,6 @@ class Entry {
 			transaction.EntryId = res.insertId;
 			await Transaction.create(transaction);
 		}
-		return res.insertId;
 	}
 
 	async save() {

@@ -1,0 +1,39 @@
+<%- include('partials/header') %>
+<div class="row">
+	<div class="col-xs-6">
+		<span class="title"><%= title %></span>
+	</div>
+	<div class="col-xs-6 text-right">
+		<a class="btn btn-primary" href="/employee/new">New Employee</a>
+	</div>
+</div>
+<table class="table table-condensed table-hover table-striped">
+	<thead>
+		<tr>
+			<th class="sort" data-column="Disabled">Status</th>
+			<th class="sort" data-column="Username">Username</th>
+			<th>Permissions</th>
+			<th></th>
+		</tr>
+	</thead>
+	<% for (var employee of employees) { %>
+		<tr>
+			<td><% if (!employee.Disabled) { %>
+				<div class="label label-success">Active</div>
+			<% } else { %>
+				<div class="label label-warning">Disabled</div>
+			<% } %></td>
+			<td><%= employee.Username %><% if (user.id == employee.EmployeeId) {%> (You)<% } %></td>
+			<td>
+				<% for (var permission in employee.Permissions) if (employee.Permissions[permission]) { %>
+					<span class="label label-info"><%=permission%></span>
+				<% } %>
+			</td>
+			<td>
+				<a class="btn btn-sm btn-link pull-right" href="/employee/<%=employee.EmployeeId%>">Edit</a>
+			</td>
+		</tr>
+	<% } %>
+</table>
+<%- include partials/paginator %>
+<%- include('partials/footer') %>
