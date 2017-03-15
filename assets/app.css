@@ -16,6 +16,16 @@
     background: #414956;
 }
 
+@media print {
+    #sidebar-wrapper {
+    	width: 0px !important;
+    }
+    
+    #wrapper {
+        padding-left: initial !important;
+    }
+}
+
 #page-content-wrapper {
     width: 100%;
     position: absolute;
