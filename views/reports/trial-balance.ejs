@@ -1,0 +1,50 @@
+<%- include('../partials/header') %>
+
+<%- include ../partials/reportHeader %>
+
+<table class="table table-striped table-condensed" style="max-width:500px;margin:0 auto">
+	<thead>
+		<tr>
+			<th>Account Name</th>
+			<th class="text-right">Debit</th>
+			<th class="text-right">Credit</th>
+		</tr>
+	</thead>
+	<% var firstDebitDollarSign = true, firstCreditDollarSign = true; %>
+	<% for (var balance of balances) { %>
+		<tr>
+			<td><a href="/account/<%=balance.AccountNumber%>"><%=balance.AccountName%></a></td>
+			<td class="text-right">
+				<% if (balance.IncreaseEntry == "DEBIT") { %>
+					<% if (firstDebitDollarSign) { %>
+						<%-balanceFormat(balance.Value)%>
+						<% firstDebitDollarSign = false %>
+					<% } else { %>
+						<%-balanceFormat(balance.Value).replace("$","")%>
+					<% } %>
+				<% } %>
+			</td>
+			<td class="text-right">
+				<% if (balance.IncreaseEntry == "CREDIT") { %>
+					<% if (firstCreditDollarSign) { %>
+						<%-balanceFormat(balance.Value)%>
+						<% firstCreditDollarSign = false %>
+					<% } else { %>
+						<%-balanceFormat(balance.Value).replace("$","")%>
+					<% } %>
+				<% } %>
+			</td>
+		</tr>
+	<% } %>
+	<tr>
+		<th>Total</th>
+		<th class="text-right" style="border-bottom:4px double #999;border-top:1px solid #999">
+			<%-balanceFormat(totalDebit)%>
+		</th>
+		<th class="text-right" style="border-bottom:4px double #999;border-top:1px solid #999">
+			<%-balanceFormat(totalCredit)%>
+		</th>
+	</tr>
+</table>
+
+<%- include('../partials/footer') %>

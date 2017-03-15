@@ -1,0 +1,42 @@
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+<div class="row">
+	<div class="col-xs-3">
+		<span class="title"><%= title %></span>
+	</div>
+	<div class="col-xs-9 text-right form-inline">
+		<div class="input-group">
+			<input type="text" id="demo" class="form-control" style="min-width:200px">
+			<div class="input-group-addon">
+				<i class="glyphicon glyphicon-calendar"></i>
+			</div>
+		</div>
+	</div>
+</div>
+<br>
+
+<script>
+	function updateQueryStringParameter(uri, key, value) {
+		var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+		var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+		if (uri.match(re)) {
+			return uri.replace(re, '$1' + key + "=" + value + '$2');
+		}
+		else {
+			return uri + separator + key + "=" + value;
+		}
+	}
+
+	$('#demo').daterangepicker({
+		showWeekNumbers: true,
+		startDate: new Date("<%=startDate.toISOString()%>"),
+		endDate: new Date("<%=endDate.toISOString()%>"),
+		opens: "left"
+	}, function (start, end) {
+		var s = updateQueryStringParameter(location.search, 'startDate', new Date(start).toISOString())
+		location.search = updateQueryStringParameter(s, 'endDate', new Date(end).toISOString())
+	});
+
+</script>

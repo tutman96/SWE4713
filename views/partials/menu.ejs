@@ -13,6 +13,14 @@
 		<a href="/employees">Employees</a>
 	</li>
 	<% } %>
+	<li class="parent">
+		<a>Reports</a>
+		<ul>
+			<li <%- (path.indexOf("/reports/trial-balance") == 0 ? 'class="active"' : "")%>>
+				<a href="/reports/trial-balance">Trial Balance</a>
+			</li>
+		</ul>
+	</li>
 	<hr>
 	<li>
 		<a href="/logout">Logout</a>
