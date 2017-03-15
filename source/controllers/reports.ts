@@ -18,7 +18,10 @@ export = (app: express.Application) => {
 			LEFT JOIN Transaction USING (AccountNumber) 
 			LEFT JOIN Entry USING (EntryId)
 			JOIN AccountType USING (AccountType)
-  			WHERE ((CreatedDate BETWEEN ? AND ?) OR CreatedDate IS NULL) AND (State = "APPROVED" OR State IS NULL)
+  			WHERE 
+				((CreatedDate BETWEEN ? AND ?) OR CreatedDate IS NULL) AND 
+				(State = "APPROVED" OR State IS NULL) AND
+				(Account.Active = 1)
 			GROUP BY AccountNumber 
 			ORDER BY IncreaseEntry DESC, SortOrder ASC`, [startDate, endDate])
 		
@@ -32,6 +35,38 @@ export = (app: express.Application) => {
 			startDate,
 			endDate,
 			balances
+		})
+	}))
+	
+	
+	app.get("/reports/income-statement", helpers.wrap(async (req, res) => {
+		var month = new Date().getMonth();
+		var year = new Date().getFullYear();
+		
+		var startDate = (req.query['startDate'] ? new Date(req.query['startDate']) : new Date(year, month, 1));
+		var endDate = (req.query['endDate'] ? new Date(req.query['endDate']) : new Date(year, month + 1, 0));
+
+		var balances = await database.query<{ AccountNumber: number, AccountName: string, AccountType: "Revenue" | "Expense", Value: number }>(`
+		SELECT AccountNumber, AccountName, AccountType, COALESCE(SUM(Value),0) as Value FROM Account 
+			LEFT JOIN Transaction USING (AccountNumber) 
+			LEFT JOIN Entry USING (EntryId)
+			JOIN AccountType USING (AccountType)
+  			WHERE 
+				((CreatedDate BETWEEN ? AND ?) OR CreatedDate IS NULL) AND 
+				(State = "APPROVED" OR State IS NULL) AND
+				(Account.Active = 1) AND (AccountType.AccountType = 'Expense' OR AccountType.AccountType = 'Revenue')
+			GROUP BY AccountNumber 
+			ORDER BY IncreaseEntry DESC, SortOrder ASC`, [startDate, endDate])
+		
+		var revenues = balances.filter((b) => b.AccountType == "Revenue");
+		var expenses = balances.filter((b) => b.AccountType == "Expense")
+		
+		return helpers.render(res, 'reports/income-statement', {
+			title: "Income Statement",
+			revenues,
+			expenses,
+			startDate,
+			endDate
 		})
 	}))
 }
