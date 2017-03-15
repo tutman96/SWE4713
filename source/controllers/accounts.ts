@@ -54,7 +54,8 @@ export = (app: express.Application) => {
 				title: "New Account",
 				isNew: true,
 				accountTypes: (await AccountTypes.find()).sort((a, b) => a.MinCode - b.MinCode),
-				account: {}
+				account: {},
+				transactions: []
 			})
 		}
 		else {
