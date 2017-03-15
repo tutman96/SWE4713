@@ -3,6 +3,7 @@ import morgan = require('morgan');
 import bodyParser = require('body-parser');
 import cookieParser = require('cookie-parser');
 import moment = require('moment');
+var fileUpload = require('express-fileupload');
 
 import ejs = require('ejs');
 import serveStatic = require('serve-static');
@@ -53,6 +54,7 @@ app.use(minifyHTML({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(fileUpload());
 
 app.use(serveStatic('.', {
     maxAge: (process.env.NODE_ENV == 'production' ? 1000 * 60 * 60 * 24 : 0)
@@ -104,6 +106,9 @@ ledger(app);
 
 import entries = require('./controllers/entries');
 entries(app);
+
+import files = require('./controllers/files');
+files(app);
 
 app.use((req, res) => {
 	res.status(404);

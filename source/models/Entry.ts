@@ -2,6 +2,7 @@ import database = require('../database');
 import { default as queryBuilder, query } from '../querybuilder';
 
 import Transaction = require('./Transaction');
+import File = require('./File');
 
 class Entry {
 	EntryId: number;
@@ -11,6 +12,7 @@ class Entry {
 	DeclinedReason: string;
 
 	transactions?: Array<Transaction>;
+	files?: Array<File>;
 
 	static async construct(props: {[K in keyof Entry]: Entry[K]}) {
 		var j = new Entry();
@@ -27,10 +29,14 @@ class Entry {
 			}
 		}
 		else if (j.EntryId) {
-			j.transactions = await Transaction.find({ EntryId: j.EntryId });
+			[j.transactions, j.files] = await Promise.all([
+				Transaction.find({ EntryId: j.EntryId }),
+				File.find({ EntryId: j.EntryId })
+			]);
 		}
 		else {
 			j.transactions = []
+			j.files = [];
 		}
 
 		return j;
@@ -56,11 +62,14 @@ class Entry {
 	static async create(entry: Entry) {
 		var res = await database.query("INSERT INTO Entry (Description, CreatedDate, State) VALUES (?,?,?)",
 			[entry.Description, entry.CreatedDate, "PENDING"])
-
+		
+		entry.EntryId = res.insertId;
+		
 		for (var transaction of entry.transactions) {
 			transaction.EntryId = res.insertId;
 			await Transaction.create(transaction);
 		}
+		return res.insertId;
 	}
 
 	async save() {

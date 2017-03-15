@@ -33,6 +33,24 @@
 			<% } %>
 		</div>
 	</div>
+	<% if (!isNew) { %>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Files</label>
+		<div class="col-sm-10">
+			<span id="files">
+				<% for (var file of entry.files) { %>
+					<a target="_blank" href="/file/<%=file.FileId%>/<%=file.Filename%>"><%=file.toString()%></a><br>
+				<% } %>
+				<% if (entry.files.length == 0) { %><span>No files</span><% } %>
+			</span>
+			<% if (entry.State == "PENDING") { %>
+			<br>
+			<input type="file" id="addFile">
+			<span id="uploadingStatus" style="display:none">Uploading...</span>
+			<% } %>
+		</div>
+	</div>
+	<% } %>
 	<div class="form-group">
 		<label class="col-sm-2 control-label">Transactions</label>
 		<div class="col-sm-10">
@@ -94,18 +112,19 @@
 		<div class="col-sm-6">
 			<button type="submit" class="btn btn-default" onclick="history.back()">Back</button>
 		</div>
-		<% if (entry.State == "PENDING") { %>
-			<div class="col-sm-6 text-right">
-				<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
-			</div>
-		<% } %>
+		<div class="col-sm-6 text-right">
+			<% if (entry.State == "PENDING") { %>
+			<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
+			<% } %>
+		</div>
 	</div>
 </div>
 
-<% if (entry.State == "PENDING") { %>
 <script>
 	var entry = <%-JSON.stringify(entry) %>;
 	var accounts = <%-JSON.stringify(accounts) %>;
+	
+	var newFiles = [];
 	
 	$("#save").click(function () {
 		$("#error").hide();
@@ -204,7 +223,7 @@
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			success: function () {
-				location.href = "/ledger"
+				location.reload()
 			},
 			error: function (request, status, error) {
 				console.error(error);
@@ -355,7 +374,40 @@
 			}			
 		})
 	})
+	
+	
+	$("#addFile").change(function () {
+		$("#error").hide();
+		$("#addFile").hide();
+		$("#uploadingStatus").show();
+		
+		var uploadElem = $(this);
+		var file = uploadElem[0].files[0];
+		var formData = new FormData();
+		formData.append('file', file);
+		
+		if (file.size == 0) {
+			$("#error").show().text("File is empty");
+			$("#addFile").show();
+			$("#uploadingStatus").hide();
+			return;
+		}
+		
+		$.ajax({
+			method: "POST",
+			url: "/file/new?EntryId=" + entry.EntryId,
+			data: formData,
+			processData: false,
+			contentType: false,
+			success: function () {
+				location.reload();
+			},
+			error: function (request, status, error) {
+				console.error(error);
+				$("#error").show().text(request.responseText);
+			}			
+		})
+	})
 </script>
-<% } %>
 
 <%- include('partials/footer') %>

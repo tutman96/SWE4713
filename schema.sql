@@ -81,3 +81,14 @@ CREATE TABLE `Employee` (
   `Disabled` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`EmployeeId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `File` (
+  `FileId` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `EntryId` int(11) DEFAULT NULL,
+  `Filename` text NOT NULL,
+  `MimeType` varchar(255) NOT NULL,
+  `Size` int(11) NOT NULL,
+  `CreatedDate` datetime NOT NULL,
+  `Path` text NOT NULL,
+  PRIMARY KEY (`FileId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

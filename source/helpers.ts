@@ -7,6 +7,14 @@ export interface Request extends express.Request {
 		username: string,
 		permissions: object,
 		exp?: number
+	},
+	files?: {
+		[key: string]: {
+			name: string,
+			mv: (path: string, callback: (err?) => void) => void,
+			mimetype: string,
+			data: Buffer
+		}
 	}
 }
 

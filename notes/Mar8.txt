@@ -1,6 +1,6 @@
 √ Single dollar sign per column
 √ Display Entry id in account page
-Attach source documents
+√ Attach source documents
 √ Add latest balance to account details
 √ Better ledger page to seperate each entry more
 √ add back buttons
