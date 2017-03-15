@@ -19,8 +19,13 @@
 		<div class="col-sm-10">
 			<% if (entry.State == "PENDING") { %>
 				<span class="label label-info">Pending</span>
+				
+				<% if (!isNew) { %>
+					<button type="submit" id="approve" class="btn btn-success pull-right">Post</button>
+					<button type="submit" id="decline" class="btn btn-danger pull-right" style="margin-right:1em">Decline</button>
+				<% } %>
 			<% } else if (entry.State == "APPROVED") { %>
-				<span class="label label-success">Approved</span>
+				<span class="label label-success">Posted</span>
 			<% } else { %>
 				<span class="label label-danger">Declined</span>
 				<br>
@@ -31,6 +36,7 @@
 	<div class="form-group">
 		<label class="col-sm-2 control-label">Transactions</label>
 		<div class="col-sm-10">
+			<% var firstDebitDollarSign = true, firstCreditDollarSign = true %>
 			<table class="table table-condensed" id="transactions">
 				<thead>
 					<tr>
@@ -49,11 +55,21 @@
 					<% } %>
 					<td class="text-right">
 					<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT' && transaction.Value >= 0 || transaction.account.AccountType.IncreaseEntry == 'CREDIT' && transaction.Value <= 0) { %>
-						<%-balanceFormat(Math.abs(transaction.Value))%>
+						<% if (firstDebitDollarSign) { %>
+							<%-balanceFormat(Math.abs(transaction.Value))%>
+							<% firstDebitDollarSign = false %>
+						<% } else { %>
+							<%-balanceFormat(Math.abs(transaction.Value)).replace("$","")%>
+						<% } %>
 						</td><td></td>
 					<% } else { %>
 						</td><td class="text-right">
-						<%-balanceFormat(Math.abs(transaction.Value))%>
+						<% if (firstCreditDollarSign) { %>
+							<%-balanceFormat(Math.abs(transaction.Value))%>
+							<% firstCreditDollarSign = false %>
+						<% } else { %>
+							<%-balanceFormat(Math.abs(transaction.Value)).replace("$","")%>
+						<% } %>
 						</td>
 					<% } %>
 					<td class="text-right">
@@ -75,15 +91,12 @@
 	</div>
 	<div class="form-group">
 		<div class="alert alert-danger" id="error" style="display:none"></div>
-		<div class="col-sm-offset-2 col-sm-5">
-			<% if (entry.State == "PENDING" && !isNew) { %>
-				<button type="submit" id="approve" class="btn btn-success">Approve</button>
-				<button type="submit" id="decline" class="btn btn-danger">Decline</button>
-			<% } %>
+		<div class="col-sm-6">
+			<button type="submit" class="btn btn-default" onclick="history.back()">Back</button>
 		</div>
 		<% if (entry.State == "PENDING") { %>
-			<div class="col-sm-5">
-				<button type="submit" id="save" class="btn btn-primary pull-right"><%=(isNew ? "Create" : "Save")%></button>
+			<div class="col-sm-6 text-right">
+				<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
 			</div>
 		<% } %>
 	</div>

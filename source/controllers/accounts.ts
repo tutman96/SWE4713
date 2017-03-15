@@ -26,7 +26,7 @@ export = (app: express.Application) => {
 					return {
 						...a,
 						canEdit: false,
-						balance: a.InitialBalance + balance.CurrentBalance
+						balance: balance.CurrentBalance
 					}
 				}
 			}

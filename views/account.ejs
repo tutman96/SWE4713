@@ -17,7 +17,7 @@
 	<div class="form-group">
 		<label for="inputAccountNumber" class="col-sm-2 control-label">Account Type</label>
 		<div class="col-sm-10">
-			<select class="form-control" name="AccountType">
+			<select class="form-control" name="AccountType" <%= transactions.length ? "disabled" : ""%>>
 				<% for (var accountType of accountTypes) { %>
 					<option value="<%=accountType.AccountType%>" <%-account.AccountType && (account.AccountType.AccountType == accountType.AccountType ? "selected" : "")%>>
 						<%=accountType.AccountType%> (#<%=accountType.MinCode%> - <%=accountType.MaxCode%>)
@@ -27,30 +27,24 @@
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">Initial Balance</label>
-		<div class="col-sm-10">
-			<div class="input-group">
-				<span class="input-group-addon">$</span>
-				<input type="number" class="form-control" name="InitialBalance" value="<%=account.InitialBalance || "0.00"%>" step="0.01">
-			</div>
-		</div>
-	</div>
-	<div class="form-group">
 		<label class="col-sm-2 control-label">Sort Order</label>
 		<div class="col-sm-10">
-			<input type="number" class="form-control" name="SortOrder" value="<%=account.SortOrder || 0%>">
+			<input type="number" class="form-control" name="SortOrder" value="<%=account.SortOrder || 0%>" <%= transactions.length ? "disabled" : ""%>>
 		</div>
 	</div>
 	<div class="form-group">
 		<label class="col-sm-2 control-label">Active</label>
 		<div class="col-sm-10">
-			<input type="checkbox" class="form-control" name="Active" <%=(account.Active ? 'checked' : '')%>>
+			<input type="checkbox" class="form-control" name="Active" <%=(account.Active ? 'checked' : '')%> <%= transactions.length ? "disabled" : ""%>>
 		</div>
 	</div>
 	
 	<div class="form-group">
 		<div class="alert alert-danger" id="error" style="display:none"></div>
-		<div class="col-sm-offset-2 col-sm-10 text-right">
+		<div class="col-sm-6">
+			<button type="submit" class="btn btn-default" onclick="history.back()">Back</button>
+		</div>
+		<div class="col-sm-6 text-right">
 			<button type="submit" id="save" class="btn btn-primary"><%=(isNew ? "Create" : "Save")%></button>
 		</div>
 	</div>
@@ -61,16 +55,22 @@
 	<table class="table table-condensed">
 		<thead>
 			<tr>
+				<th>Entry Id</th>
 				<th>Date</th>
 				<th>Entry</th>
 				<th class="text-right">Value</th>
+				<th class="text-right">Balance</th>
 			</tr>
 		</thead>
+		<% balance = 0 %>
 		<% for (var transaction of transactions) { %>
+		<% balance += transaction.Value %>
 			<tr>
+				<td><a href="/entry/<%=transaction.EntryId%>">#<%=transaction.EntryId%></a></td>
 				<td><%=dateFormat(transaction.CreatedDate,'LL')%></td>
 				<td><a href="/entry/<%=transaction.EntryId%>"><%=transaction.Description%></a></td>
 				<td class="text-right"><%-balanceFormat(transaction.Value)%></td>
+				<td class="text-right"><%-balanceFormat(balance)%></td>
 			</tr>
 		<% } %>
 		<% if (transactions.length == 0) { %>
@@ -92,7 +92,6 @@
 			AccountNumber: +$("input[name=AccountNumber]").val(),
 			AccountType: $("select[name=AccountType]").val(),
 			AccountName: $("input[name=AccountName]").val(),
-			InitialBalance: +$("input[name=InitialBalance]").val(),
 			SortOrder: +$("input[name=SortOrder]").val(),
 			Active: !!$("input[name=Active]").prop('checked')
 		}

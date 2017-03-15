@@ -7,7 +7,6 @@ class Account {
 	AccountNumber: number;
 	AccountType: AccountType;
 	AccountName: string;
-	InitialBalance: number;
 	SortOrder: number;
 	Active: boolean;
 	CreatedTime: Date;
@@ -21,7 +20,6 @@ class Account {
 		at.AccountType = await AccountType.findOne({ AccountType: accountType });
 
 		at.AccountName = props.AccountName;
-		at.InitialBalance = props.InitialBalance;
 		at.SortOrder = props.SortOrder;
 		at.Active = (typeof props.Active == "string" ? (props.Active == "true") : !!props.Active);
 		at.CreatedTime = props.CreatedTime;
@@ -47,13 +45,13 @@ class Account {
 	}
 
 	static async create(account: Account) {
-		await database.query("INSERT INTO Account (AccountNumber, AccountType, AccountName, InitialBalance, SortOrder, Active, CreatedTime, CreatedBy) VALUES (?,?,?,?,?,?,NOW(),0)",
-			[account.AccountNumber, account.AccountType.AccountType, account.AccountName, account.InitialBalance, account.SortOrder, +account.Active])
+		await database.query("INSERT INTO Account (AccountNumber, AccountType, AccountName, SortOrder, Active, CreatedTime, CreatedBy) VALUES (?,?,?,?,?,?,NOW(),0)",
+			[account.AccountNumber, account.AccountType.AccountType, account.AccountName, account.SortOrder, +account.Active])
 	}
 	
 	async save() {		
-		await database.query("UPDATE Account SET AccountType = ?, AccountName = ?, InitialBalance = ?, SortOrder = ?, Active = ? WHERE AccountNumber = ?",
-			[this.AccountType.AccountType, this.AccountName, this.InitialBalance, this.SortOrder, +this.Active, this.AccountNumber])
+		await database.query("UPDATE Account SET AccountType = ?, AccountName = ?, SortOrder = ?, Active = ? WHERE AccountNumber = ?",
+			[this.AccountType.AccountType, this.AccountName, this.SortOrder, +this.Active, this.AccountNumber])
 	}
 	
 	async delete() {

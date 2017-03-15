@@ -1,4 +1,5 @@
 <%- include('partials/header') %>
+<% var firstDollarSign = true %>
 <div class="row">
 	<div class="col-xs-6">
 		<span class="title"><%= title %></span>
@@ -29,7 +30,14 @@
 			<td><%= account.AccountNumber %></td>
 			<td><%= account.AccountType.AccountType %></td>
 			<td><%= account.AccountName %></td>
-			<td style="text-align:right;padding-right:1em"><%- balanceFormat(account.balance) %></td>
+			<td style="text-align:right;padding-right:1em">
+				<% if (firstDollarSign) { %>
+					<%-balanceFormat(account.balance)%>
+					<% firstDollarSign = false %>
+				<% } else { %>
+					<%-balanceFormat(account.balance).replace("$","")%>
+				<% } %>
+			</td>
 			<td><%= dateFormat(account.CreatedTime) %></td>
 			<td>
 				<a class="btn btn-sm btn-link pull-right" href="/account/<%=account.AccountNumber%>">Edit</a>
