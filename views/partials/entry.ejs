@@ -69,8 +69,22 @@
 <tr style="margin-bottom: 1em">
 	<td></td>
 	<td></td>
-	<td style="border-bottom:4px double #999;border-top:1px solid #999;text-align:right"><b><%-balanceFormat(entry.totalCredits)%></b></td>
-	<td style="border-bottom:4px double #999;border-top:1px solid #999;text-align:right"><b><%-balanceFormat(entry.totalDebits)%></b></td>
+	<td style="border-bottom:4px double #999;border-top:1px solid #999;text-align:right">
+		<% if (firstDebitDollarSign) { %>
+			<b><%-balanceFormat(Math.abs(entry.totalDebits))%></b>
+			<% firstDebitDollarSign = false %>
+		<% } else { %>
+			<b><%-balanceFormat(Math.abs(entry.totalDebits)).replace("$","")%></b>
+		<% } %>
+	</td>
+	<td style="border-bottom:4px double #999;border-top:1px solid #999;text-align:right">
+		<% if (firstCreditDollarSign) { %>
+			<b><%-balanceFormat(Math.abs(entry.totalCredits))%></b>
+			<% firstCreditDollarSign = false %>
+		<% } else { %>
+			<b><%-balanceFormat(Math.abs(entry.totalCredits)).replace("$","")%></b>
+		<% } %>
+	</td>
 	<td></td>
 	<td></td>
 </tr>

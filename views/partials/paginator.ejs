@@ -7,3 +7,38 @@
 		<% if (page == totalPages) { %><li class="next disabled"><a>Next Page &rarr;</a></li><% } %>
 	</ul>
 </nav>
+
+<script>
+	var sortText = "<%=sort.toLowerCase()%>"
+	function updateQueryStringParameter(uri, key, value) {
+		var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i"); 
+		var separator = uri.indexOf('?') !== -1 ? "&" : "?"; 
+		if (uri.match(re)) { 
+			return uri.replace(re, '$1' + key + "=" + value + '$2'); 
+		}
+		else { 
+			return uri + separator + key + "=" + value; 
+		}
+	}
+	
+	$(".sort").each(function (i, elem) {
+		var e = $(elem);
+		var column = e.attr("data-column").toLowerCase();
+		var sortedOnThisColumn = false;
+		var asc = false;
+		if (sortText.indexOf(column) != -1) {
+			sortedOnThisColumn = true;
+			if (sortText.indexOf("-") == 0) {
+				e.addClass("desc");
+			}
+			else {
+				e.addClass("asc");
+				asc = true;
+			}
+		}
+		
+		e.click(function () {
+			location.search = updateQueryStringParameter(location.search, "sort", (asc ? "-" : "") + column);
+		})
+	})
+</script>

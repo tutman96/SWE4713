@@ -109,3 +109,30 @@
 	font-size: 20px;
     margin-bottom: 1em;
 }
+
+.sort {
+    cursor: pointer
+}
+
+.sort.asc::after, .sort.desc::after {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: .5em;
+    vertical-align: middle;
+    border-top: 4px dashed;
+    border-top: 4px solid\9;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+
+.sort.asc::after {
+    content: "";
+    border-top: 0;
+    border-bottom: 4px dashed;
+}
+.sort.desc::after {
+    content: "";
+    border-top: 4px dashed;
+    border-bottom: 0;
+}

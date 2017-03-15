@@ -12,10 +12,12 @@ export = (app: express.Application) => {
 		var page = +req.query['page'] || 1;
 		var maxEntries = 20;
 
+		var sort: string = req.query['sort'] || "SortOrder";
+
 		var [accounts, numberOfAccounts] = await Promise.all([
-			Account.find({}, maxEntries, maxEntries * (page - 1)),
-			Account.count()
-		]);
+				Account.find({}, maxEntries, maxEntries * (page - 1), sort),
+				Account.count()
+			]);
 
 		var accountNumbers = accounts.map((a) => a.AccountNumber);
 		var balances = await database.query<{ AccountNumber: number, CurrentBalance: number }>("SELECT AccountNumber, SUM(Value) as CurrentBalance FROM Transaction JOIN Entry USING (EntryId) WHERE Entry.State = 'APPROVED' && AccountNumber IN (?) GROUP BY AccountNumber", [accountNumbers]);
@@ -39,7 +41,8 @@ export = (app: express.Application) => {
 
 		return helpers.render(res, 'accounts', {
 			title: "Accounts",
-			accounts: accountsWithBalances.sort((a, b) => a.SortOrder - b.SortOrder),
+			accounts: accountsWithBalances,
+			sort,
 			page,
 			totalPages: Math.ceil(numberOfAccounts / maxEntries)
 		})

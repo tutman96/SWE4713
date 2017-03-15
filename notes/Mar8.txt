@@ -4,4 +4,4 @@
 √ Add latest balance to account details
 √ Better ledger page to seperate each entry more
 √ add back buttons
-sorting stuff
+√ sorting stuff

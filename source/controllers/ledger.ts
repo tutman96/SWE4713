@@ -8,13 +8,15 @@ export = (app: express.Application) => {
 	app.get("/ledger", helpers.wrap(async (req, res) => {
 		var page = +req.query['page'] || 1;
 		var maxEntries = 5;
+		
+		var sort: string = req.query['sort'] || "EntryId";
 
 		var [entries, numEntries] = await Promise.all([
-			Entry.find({}, maxEntries, maxEntries * (page - 1)),
+			Entry.find({}, maxEntries, maxEntries * (page - 1), sort),
 			Entry.count()
 		])
 
-		var entriesWithTotals = entries.sort((a, b) => b.CreatedDate.getTime() - a.CreatedDate.getTime()).map((e) => {
+		var entriesWithTotals = entries.map((e) => {
 			var totalDebits = 0;
 			var totalCredits = 0;
 
@@ -36,6 +38,7 @@ export = (app: express.Application) => {
 
 		return helpers.render(res, 'ledger', {
 			entries: entriesWithTotals,
+			sort,
 			page,
 			totalPages: Math.ceil(numEntries / maxEntries)
 		});

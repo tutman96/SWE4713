@@ -21,7 +21,19 @@ type conditional<T, P extends keyof T> = {
 export type query<T> = {[P in keyof T]?: T[P] | conditional<T, P>};
 
 export default function <T extends Object>(table: string) {
-	return function (query: query<T>, limit?: number, offset?: number) {
+	return function (query: query<T>, limit?: number, offset?: number, sort?: string) {
+		var s;
+		if (sort) {
+			s = {};
+			if (sort.indexOf("-") == 0) {
+				sort = sort.substr(1);
+				s[sort] = "desc";
+			}
+			else {
+				s[sort] = "asc";
+			}
+		}
+		
 		var q: {
 			query: string,
 			values: Array<any>
@@ -30,7 +42,8 @@ export default function <T extends Object>(table: string) {
 			table: table,
 			where: query,
 			limit: limit,
-			offset: offset
+			offset: offset,
+			order: s
 		})
 
 		for (var i in q.values) {

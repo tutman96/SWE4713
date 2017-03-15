@@ -28,8 +28,8 @@ class Account {
 	}
 
 	private static builder = queryBuilder<Account>("Account")
-	static async find(query: query<Account> = {}, limit?: number, offset?: number) {
-		var sql = this.builder(query, limit, offset);
+	static async find(query: query<Account> = {}, limit?: number, offset?: number, order?: string) {
+		var sql = this.builder(query, limit, offset, order);
 		var results = await database.query<any>(sql);
 		return Promise.all(results.map(this.construct))
 	}

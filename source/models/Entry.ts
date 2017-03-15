@@ -43,8 +43,8 @@ class Entry {
 	}
 
 	private static builder = queryBuilder<Entry>("Entry")
-	static async find(query: query<Entry> = {}, limit?: number, offset?: number) {
-		var sql = this.builder(query, limit, offset);
+	static async find(query: query<Entry> = {}, limit?: number, offset?: number, sort?: string) {
+		var sql = this.builder(query, limit, offset, sort);
 		var results = await database.query<any>(sql);
 		return Promise.all(results.map(this.construct))
 	}
