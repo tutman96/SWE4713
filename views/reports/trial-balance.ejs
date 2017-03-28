@@ -15,22 +15,22 @@
 		<tr>
 			<td><a href="/account/<%=balance.AccountNumber%>"><%=balance.AccountName%></a></td>
 			<td class="text-right">
-				<% if (balance.IncreaseEntry == "DEBIT") { %>
+				<% if ((balance.IncreaseEntry == "DEBIT" && balance.Value >= 0) || (balance.IncreaseEntry == "CREDIT" && balance.Value < 0)) { %>
 					<% if (firstDebitDollarSign) { %>
-						<%-balanceFormat(balance.Value)%>
+						<%-balanceFormat(Math.abs(balance.Value))%>
 						<% firstDebitDollarSign = false %>
 					<% } else { %>
-						<%-balanceFormat(balance.Value).replace("$","")%>
+						<%-balanceFormat(Math.abs(balance.Value)).replace("$","")%>
 					<% } %>
 				<% } %>
 			</td>
 			<td class="text-right">
-				<% if (balance.IncreaseEntry == "CREDIT") { %>
+				<% if ((balance.IncreaseEntry == "CREDIT" && balance.Value >= 0) || (balance.IncreaseEntry == "DEBIT" && balance.Value < 0)) { %>
 					<% if (firstCreditDollarSign) { %>
-						<%-balanceFormat(balance.Value)%>
+						<%-balanceFormat(Math.abs(balance.Value))%>
 						<% firstCreditDollarSign = false %>
 					<% } else { %>
-						<%-balanceFormat(balance.Value).replace("$","")%>
+						<%-balanceFormat(Math.abs(balance.Value)).replace("$","")%>
 					<% } %>
 				<% } %>
 			</td>

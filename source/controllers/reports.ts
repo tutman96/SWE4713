@@ -23,10 +23,21 @@ export = (app: express.Application) => {
 				State = "APPROVED" AND
 				Account.Active = 1
 			GROUP BY AccountNumber 
-			ORDER BY IncreaseEntry DESC, SortOrder ASC`, [startDate, endDate])
+			ORDER BY SortOrder ASC`, [startDate, endDate])
 		
-		var totalDebit = balances.filter((b) => b.IncreaseEntry == "DEBIT").map((b) => b.Value).reduce((prev, current) => prev + current, 0);
-		var totalCredit = balances.filter((b) => b.IncreaseEntry == "CREDIT").map((b) => b.Value).reduce((prev, current) => prev + current, 0);
+		// var totalDebit = balances.filter((b) => b.IncreaseEntry == "DEBIT").map((b) => b.Value).reduce((prev, current) => prev + current, 0);
+		// var totalCredit = balances.filter((b) => b.IncreaseEntry == "CREDIT").map((b) => b.Value).reduce((prev, current) => prev + current, 0);
+		var totalDebit = 0;
+		var totalCredit = 0;
+		
+		balances.forEach((balance) => {
+			if ((balance.IncreaseEntry == "CREDIT" && balance.Value > 0) || (balance.IncreaseEntry == "DEBIT" && balance.Value < 0)) {
+				totalCredit += Math.abs(balance.Value)
+			}
+			else if ((balance.IncreaseEntry == "DEBIT" && balance.Value > 0) || (balance.IncreaseEntry == "CREDIT" && balance.Value < 0)) {
+				totalDebit += Math.abs(balance.Value)
+			}
+		})
 		
 		return helpers.render(res, 'reports/trial-balance', {
 			title: "Trial Balance",

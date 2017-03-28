@@ -45,8 +45,8 @@ class Account {
 	}
 
 	static async create(account: Account) {
-		await database.query("INSERT INTO Account (AccountNumber, AccountType, AccountName, SortOrder, Active, CreatedTime, CreatedBy) VALUES (?,?,?,?,?,?,NOW(),0)",
-			[account.AccountNumber, account.AccountType.AccountType, account.AccountName, account.SortOrder, +account.Active])
+		await database.query("INSERT INTO Account (AccountNumber, AccountType, AccountName, SortOrder, Active, CreatedTime, CreatedBy) VALUES (?,?,?,?,?,NOW(),?)",
+			[account.AccountNumber, account.AccountType.AccountType, account.AccountName, account.SortOrder, +account.Active, account.CreatedBy])
 	}
 	
 	async save() {		

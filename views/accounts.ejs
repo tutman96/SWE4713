@@ -16,7 +16,7 @@
 			<th class="sort" data-column="AccountType">Account Type</th>
 			<th class="sort" data-column="AccountName">Account Name</th>
 			<th class="text-right" style="padding-right:1em">Balance&nbsp;</th>
-			<th class="sort" data-column="CreatedTime">Created Time</th>
+			<th class="sort" data-column="CreatedTime">Created</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -38,7 +38,7 @@
 					<%-balanceFormat(account.balance).replace("$","")%>
 				<% } %>
 			</td>
-			<td><%= dateFormat(account.CreatedTime) %></td>
+			<td><%= dateFormat(account.CreatedTime, 'LL') %></td>
 			<td>
 				<a class="btn btn-sm btn-link pull-right" href="/account/<%=account.AccountNumber%>">Edit</a>
 			</td>
