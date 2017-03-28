@@ -101,9 +101,6 @@ login.init(app);
 import accounts = require('./controllers/accounts');
 accounts(app);
 
-import ledger = require('./controllers/ledger');
-ledger(app);
-
 import entries = require('./controllers/entries');
 entries(app);
 
