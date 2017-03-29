@@ -28,4 +28,46 @@
 </table>
 <%- include partials/paginator %>
 
+<script>
+	function post(entryId) {
+		if (!confirm("Are you sure you want to post this entry? This will post it to the accounts and cannot be undone.")) return;
+		
+		$.ajax({
+			method: "POST",
+			url: "/entry/" + entryId + "/approve",
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function () {
+				location.reload();
+			},
+			error: function (request, status, error) {
+				console.error(error);
+				$("#error").show().text(request.responseText);
+			}			
+		})
+	}
+	
+	function decline(entryId) {
+		var p = prompt("Are you sure you want to decline this entry? This cannot be undone.\nPlease give a reason if you wish to continue.");
+		if (!p) return;
+		
+		$.ajax({
+			method: "POST",
+			url: "/entry/" + entryId + "/decline",
+			data: JSON.stringify({
+				DeclinedReason: p
+			}),
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function () {
+				location.reload();
+			},
+			error: function (request, status, error) {
+				console.error(error);
+				$("#error").show().text(request.responseText);
+			}			
+		})
+	}
+</script>
+
 <%- include('partials/footer') %>

@@ -30,7 +30,9 @@
 		<% if (i == 0) { %>
 			<td rowspan="<%= entry.transactions.length + 1 %>" class="text-right">
 				<% if (entry.State == "PENDING") { %>
-					<span class="label label-info">Pending</span>
+					<span class="label label-info">Pending</span><br><br>
+					<button onclick="post(<%=entry.EntryId%>);return false" class="btn btn-xs btn-success">Post</button>
+					<button onclick="decline(<%=entry.EntryId%>);return false" class="btn btn-xs btn-danger">Decline</button>
 				<% } else if (entry.State == "APPROVED") { %>
 					<span class="label label-success">Posted</span>
 				<% } else { %>
@@ -40,7 +42,7 @@
 				<% } %>
 			</td>
 			<td rowspan="<%= entry.transactions.length + 1 %>" class="text-right">
-				<a class="btn btn-link" href="/entry/<%=entry.EntryId%>">Edit</a>
+				<a class="btn btn-xs btn-link" href="/entry/<%=entry.EntryId%>">Edit</a><br>				
 			</td>
 		<% } %>
 </tr>
@@ -52,7 +54,9 @@
 	<% if (entry.transactions.length == 0) { %>
 		<td rowspan="<%= entry.transactions.length + 1 %>" class="text-right">
 			<% if (entry.State == "PENDING") { %>
-				<span class="label label-info">Pending</span>
+				<span class="label label-info">Pending</span><br><br>
+				<button onclick="post(<%=entry.EntryId%>);return false" class="btn btn-xs btn-success">Post</button>
+				<button onclick="decline(<%=entry.EntryId%>);return false" class="btn btn-xs btn-danger">Decline</button>
 			<% } else if (entry.State == "APPROVED") { %>
 				<span class="label label-success">Posted</span>
 			<% } else { %>
@@ -62,7 +66,7 @@
 			<% } %>
 		</td>
 		<td rowspan="<%= entry.transactions.length + 1 %>" class="text-right">
-			<a class="btn btn-link" href="/entry/<%=entry.EntryId%>">Edit</a>
+			<a class="btn btn-xs btn-link" href="/entry/<%=entry.EntryId%>">Edit</a><br>
 		</td>
 	<% } %>
 </tr>
