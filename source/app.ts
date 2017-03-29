@@ -56,8 +56,13 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(fileUpload());
 
+
+app.use("/files", (req, res) => {
+	return res.status(302).location('/login').end();
+})
+
 app.use(serveStatic('.', {
-    maxAge: (process.env.NODE_ENV == 'production' ? 1000 * 60 * 60 * 24 : 0)
+    maxAge: (process.env.NODE_ENV == 'production' ? 1000 * 60 * 60 * 24 : 0),
 }))
 
 var currencyFormatter = require('currency-formatter');

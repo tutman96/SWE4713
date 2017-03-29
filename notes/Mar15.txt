@@ -1,5 +1,5 @@
 √ Fix status errors
-Create event log
+√ Create event log
 √ Ledger is per account
 √ click only once to post
 √ No save on account page

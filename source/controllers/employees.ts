@@ -2,6 +2,7 @@ import express = require('express');
 import helpers = require('../helpers');
 
 import Employee = require('../models/Employee');
+import EventLog = require("../models/EventLog");
 
 import { hash } from './login';
 
@@ -63,12 +64,14 @@ export = (app: express.Application) => {
 		var passHash;
 		if (req.body.Password) {
 			passHash = hash(req.body.Username, req.body.Password)
+			delete req.body.Password
 		}
 
 		if (req.params['EmployeeId'] == "new") {
 			req.body.PassHash = passHash
 			var employee = await Employee.construct(req.body);
 			await Employee.create(employee);
+			await EventLog.createLog(req.token.id, "created employee '" + employee.Username);
 		}
 		else {
 			var oldEmployee = await Employee.findOne({ EmployeeId: req.params['EmployeeId'] });
@@ -76,13 +79,17 @@ export = (app: express.Application) => {
 				return helpers.render(res, '404');
 			}
 
-			req.body.EmployeeId = req.params['EmployeeId'];
+			req.body.EmployeeId = +req.params['EmployeeId'];
 			if (passHash) req.body.PassHash = passHash;
 			else req.body.PassHash = oldEmployee.PassHash;
 			req.body.Disabled = oldEmployee.Disabled;
 			
 			var employee = await Employee.construct(req.body);
 			await employee.save();
+			
+			var diffs = helpers.diff(oldEmployee, employee);
+			diffs.fieldsToHide.push("PassHash");
+			await EventLog.createLog(req.token.id, "edited employee '" + oldEmployee.Username + "': " + diffs.toString());
 		}
 	}))
 
@@ -92,6 +99,8 @@ export = (app: express.Application) => {
 		var employee = await Employee.findOne({ EmployeeId: req.params['EmployeeId'] });
 		employee.Disabled = true;
 		await employee.save();
+		
+		await EventLog.createLog(req.token.id, "disabled employee '" + employee.Username + "'");
 	}))
 
 	app.post("/employee/:EmployeeId/enable", helpers.wrap(async (req, res) => {
@@ -100,5 +109,7 @@ export = (app: express.Application) => {
 		var employee = await Employee.findOne({ EmployeeId: req.params['EmployeeId'] });
 		employee.Disabled = false;
 		await employee.save();
+		
+		await EventLog.createLog(req.token.id, "enabled employee '" + employee.Username + "'");
 	}))
 }

@@ -57,6 +57,10 @@ class Account {
 	async delete() {
 		await database.query("DELETE FROM Account WHERE AccountNumber = ?", [this.AccountNumber])
 	}
+	
+	toString() {
+		return this.AccountName + " (#" + this.AccountNumber + ")";
+	}
 }
 
 export = Account;

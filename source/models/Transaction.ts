@@ -52,6 +52,10 @@ class Transaction {
 	equals(transaction: Transaction) {
 		return this.AccountNumber == transaction.AccountNumber && this.EntryId == transaction.EntryId
 	}
+	
+	toString() {
+		return this.account.AccountName + " " + (this.Value > 0 ? "+" : "") + this.Value.toFixed(2);
+	}
 }
 
 export = Transaction;

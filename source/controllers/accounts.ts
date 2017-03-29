@@ -6,6 +6,7 @@ import Account = require("../models/Account");
 import AccountTypes = require("../models/AccountType");
 import Transaction = require("../models/Transaction");
 import Entry = require("../models/Entry");
+import EventLog = require("../models/EventLog");
 
 export = (app: express.Application) => {
 	app.get("/accounts", helpers.wrap(async (req, res) => {
@@ -93,9 +94,10 @@ export = (app: express.Application) => {
 			var account = await Account.construct(req.body);
 			account.CreatedBy = req.token.id;
 			await Account.create(account);
+			await EventLog.createLog(req.token.id, "created new account '" + account.toString() + "'");
 		}
 		else {
-			req.body['AccountNumber'] = req.params['AccountNumber'];
+			req.body['AccountNumber'] = +req.params['AccountNumber'];
 			var oldAccount = await Account.findOne({ AccountNumber: req.params['AccountNumber'] });
 			if (!oldAccount) {
 				return helpers.render(res, '404');
@@ -103,6 +105,9 @@ export = (app: express.Application) => {
 
 			var account = await Account.construct(req.body);
 			await account.save();
+			
+			var diffs = helpers.diff(oldAccount, account);
+			await EventLog.createLog(req.token.id, "edited account '" + oldAccount.toString() + "': " + diffs.toString());
 		}
 	}));
 

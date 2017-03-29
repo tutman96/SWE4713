@@ -59,3 +59,55 @@ export function render(res: Response, template: string, data?: any) {
 		})
 	})
 }
+
+export class DiffArray<T> extends Array<{ Field: keyof T, From: T[keyof T], To: T[keyof T] }> {
+	fieldsToHide = new Array<keyof T>();
+
+	toString() {
+		return this.map((diff) => {
+			if (this.fieldsToHide.indexOf(diff.Field) != -1) {
+				return diff.Field
+			}
+			else {
+				return diff.Field + " from '" + JSON.stringify(diff.From) + "' to '" + JSON.stringify(diff.To) + "'"
+			}
+		}).join(", ");
+	}
+}
+
+function equals(x, y) {
+	if (x == y) return true;
+	if (!(x instanceof Object) || !(y instanceof Object)) return false;
+	if (x.constructor !== y.constructor) return false;
+	
+	if (x.toString && x.toString() != y.toString()) return false;
+
+	for (var p in x) {
+		if (!x.hasOwnProperty(p)) continue;
+		if (!y.hasOwnProperty(p)) return false;
+		if (x[p] === y[p]) continue;
+		if (typeof (x[p]) !== "object") return false;
+		if (!equals(x[p], y[p])) return false;
+	}
+
+	for (p in y) {
+		if (y.hasOwnProperty(p) && !x.hasOwnProperty(p)) return false;
+	}
+	return true;
+}
+
+export function diff<T>(oldObject: T, newObject: T) {
+	var diffs = new DiffArray<T>();
+	for (var k in newObject) {
+		console.log("Testing " + k + ":", newObject[k], oldObject[k]);
+		if (!equals(newObject[k], oldObject[k])) {
+			diffs.push({
+				Field: k,
+				From: oldObject[k],
+				To: newObject[k]
+			})
+		}
+	}
+
+	return diffs;
+}

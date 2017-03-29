@@ -3,12 +3,13 @@ import helpers = require('../helpers');
 
 import Entry = require("../models/Entry");
 import Account = require("../models/Account");
+import EventLog = require("../models/EventLog");
 
 export = (app: express.Application) => {
 	app.get("/entries", helpers.wrap(async (req, res) => {
 		var page = +req.query['page'] || 1;
 		var maxEntries = 5;
-		
+
 		var sort: string = req.query['sort'] || "EntryId";
 
 		var [entries, numEntries] = await Promise.all([
@@ -43,7 +44,7 @@ export = (app: express.Application) => {
 			totalPages: Math.ceil(numEntries / maxEntries)
 		});
 	}));
-	
+
 	app.get("/entry/:EntryId", helpers.wrap(async (req, res) => {
 		if (req.params['EntryId'] == "new") {
 			return helpers.render(res, 'entry', {
@@ -79,6 +80,7 @@ export = (app: express.Application) => {
 		if (req.params['EntryId'] == "new") {
 			var entry = await Entry.construct(req.body);
 			await Entry.create(entry);
+			await EventLog.createLog(req.token.id, "created entry '" + entry.toString() + "'")
 			return {
 				EntryId: entry.EntryId
 			}
@@ -88,9 +90,26 @@ export = (app: express.Application) => {
 			if (!oldEntry) {
 				return helpers.render(res, '404');
 			}
-			req.body.EntryId = req.params.EntryId
+			req.body.EntryId = +req.params.EntryId
 			var entry = await Entry.construct(req.body);
 			await entry.save();
+
+			var diffs = helpers.diff(oldEntry, entry);
+
+			for (var i = 0; i < diffs.length; i++) {
+				if (diffs[i].Field == "transactions") {
+					diffs[i] = {
+						Field: diffs[i].Field,
+						From: diffs[i].From['map']((t) => t.toString())['join'](', '),
+						To: diffs[i].To['map']((t) => t.toString())['join'](', ')
+					}
+				}
+			}
+			diffs.fieldsToHide.push("files");
+
+			if (diffs.length) {
+				await EventLog.createLog(req.token.id, "edited entry '" + oldEntry.toString() + "': " + diffs.toString());
+			}
 		}
 	}))
 
@@ -102,6 +121,8 @@ export = (app: express.Application) => {
 		if (entry.State != "PENDING") return;
 		entry.State = "APPROVED";
 		await entry.save();
+
+		await EventLog.createLog(req.token.id, "posted entry '" + entry.toString() + "'");
 	}))
 
 	app.post("/entry/:EntryId/decline", helpers.wrap(async (req, res) => {
@@ -113,5 +134,7 @@ export = (app: express.Application) => {
 		entry.State = "DECLINED";
 		entry.DeclinedReason = req.body['DeclinedReason'];
 		await entry.save();
+
+		await EventLog.createLog(req.token.id, "declined entry '" + entry.toString() + "' because '" + entry.DeclinedReason + "'");
 	}))
 }

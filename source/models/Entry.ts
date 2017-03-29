@@ -111,6 +111,10 @@ class Entry {
 			await transaction.delete();
 		}
 	}
+	
+	toString() {
+		return this.Description
+	}
 }
 
 export = Entry;
