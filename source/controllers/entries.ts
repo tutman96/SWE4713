@@ -53,7 +53,8 @@ export = (app: express.Application) => {
 				entry: {
 					Description: "",
 					State: "PENDING",
-					transactions: []
+					transactions: [],
+					files: []
 				},
 				accounts: (await Account.find({ Active: true })).sort((a, b) => a.SortOrder - b.SortOrder)
 			})
@@ -78,6 +79,9 @@ export = (app: express.Application) => {
 		if (req.params['EntryId'] == "new") {
 			var entry = await Entry.construct(req.body);
 			await Entry.create(entry);
+			return {
+				EntryId: entry.EntryId
+			}
 		}
 		else {
 			var oldEntry = await Entry.findOne({ EntryId: req.params.EntryId });

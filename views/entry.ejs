@@ -33,7 +33,6 @@
 			<% } %>
 		</div>
 	</div>
-	<% if (!isNew) { %>
 	<div class="form-group">
 		<label class="col-sm-2 control-label">Files</label>
 		<div class="col-sm-10">
@@ -41,16 +40,14 @@
 				<% for (var file of entry.files) { %>
 					<a target="_blank" href="/file/<%=file.FileId%>/<%=file.Filename%>"><%=file.toString()%></a><br>
 				<% } %>
-				<% if (entry.files.length == 0) { %><span>No files</span><% } %>
+				<% if (entry.files.length == 0 && !isNew) { %><span>No files</span><br><% } %>
 			</span>
 			<% if (entry.State == "PENDING") { %>
-			<br>
 			<input type="file" id="addFile">
 			<span id="uploadingStatus" style="display:none">Uploading...</span>
 			<% } %>
 		</div>
 	</div>
-	<% } %>
 	<div class="form-group">
 		<label class="col-sm-2 control-label">Transactions</label>
 		<div class="col-sm-10">
@@ -222,8 +219,44 @@
 			data: JSON.stringify(formData),
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
-			success: function () {
-				location.reload()
+			success: function (data) {
+				console.log(data, typeof data);		
+				if (!entry.EntryId) entry.EntryId = data.EntryId;
+				
+				if (newFiles.length > 0) {
+					function uploadFile(file, callback) {
+						var formData = new FormData();
+						formData.append('file', file);
+						
+						$.ajax({
+							method: "POST",
+							url: "/file/new?EntryId=" + entry.EntryId,
+							data: formData,
+							processData: false,
+							contentType: false,
+							success: function () {
+								callback()
+							},
+							error: function (request, status, error) {
+								console.error(error);
+								$("#error").show().text(request.responseText);
+							}			
+						})
+					}
+					
+					var count = 0;
+					newFiles.forEach((file) => {
+						uploadFile(file, function() {
+							count++;
+							if (count == newFiles.length) {
+								location.href = "/entries"
+							}
+						})
+					})
+				}
+				else {
+					location.href = "/entries"
+				}
 			},
 			error: function (request, status, error) {
 				console.error(error);
@@ -378,35 +411,18 @@
 	
 	$("#addFile").change(function () {
 		$("#error").hide();
-		$("#addFile").hide();
-		$("#uploadingStatus").show();
 		
 		var uploadElem = $(this);
 		var file = uploadElem[0].files[0];
-		var formData = new FormData();
-		formData.append('file', file);
 		
 		if (file.size == 0) {
 			$("#error").show().text("File is empty");
-			$("#addFile").show();
-			$("#uploadingStatus").hide();
 			return;
 		}
 		
-		$.ajax({
-			method: "POST",
-			url: "/file/new?EntryId=" + entry.EntryId,
-			data: formData,
-			processData: false,
-			contentType: false,
-			success: function () {
-				location.reload();
-			},
-			error: function (request, status, error) {
-				console.error(error);
-				$("#error").show().text(request.responseText);
-			}			
-		})
+		newFiles.push(file);
+		$("#files").append($("<span>").html(file.name + " <i>(not saved)</i><br>"));
+		uploadElem.replaceWith(uploadElem.val('').clone(true));
 	})
 </script>
 
