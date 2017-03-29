@@ -5,6 +5,7 @@ import fs = require('fs');
 var jwtSecret = fs.readFileSync('./secret.txt').toString();
 
 import Employee = require('../models/Employee');
+import EventLog = require('../models/EventLog');
 
 import crypto = require('crypto');
 export function hash(username: string, password: string) {
@@ -32,6 +33,7 @@ export var init = (app: helpers.app) => {
 		var e = await Employee.findOne({ Username: username, PassHash: hash(username, password) });
 		if (!e) {
 			res.status(401);
+			EventLog.createLog(0, "Invalid login attempt for username '" + username + "'");
 			return "Invalid username or password"
 		}
 
@@ -45,6 +47,8 @@ export var init = (app: helpers.app) => {
 			username: e.Username,
 			permissions: e.Permissions,
 		}
+
+		EventLog.createLog(token.id, "Successful login valid until " + new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toString());
 
 		res.cookie('token', jwt.sign(token, jwtSecret, { expiresIn: '7d' }), {
 			expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
