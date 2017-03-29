@@ -118,6 +118,9 @@ employees(app);
 import reports = require('./controllers/reports');
 reports(app);
 
+import eventlog = require('./controllers/eventlog');
+eventlog(app);
+
 app.use((req, res) => {
 	res.status(404);
 	res.render("404");

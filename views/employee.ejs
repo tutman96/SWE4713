@@ -43,6 +43,26 @@
 	</div>
 </div>
 
+<% if (!isNew) { %>
+	<br>
+	<span class="title">Recent Events</span>
+	<table class="table table-condensed table-striped">
+		<thead>
+			<tr>
+				<th>Timestamp</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<% for (var event of events) { %>
+			<tr>
+				<td><%=dateFormat(event.Timestamp)%></td>
+				<td><%=event.Description%></td>
+			</tr>
+		<% } %>
+		<% if (events.length == 0) { %><tr class="text-center text-muted"><td colspan="2">No Recent Events</td><% } %>
+	</table>
+<% } %>
+
 <script>
 	var employee = <%-JSON.stringify(employee)%>;
 	var passwordText = "haha, you thought you could get my password";

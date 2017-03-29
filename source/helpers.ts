@@ -76,6 +76,7 @@ export class DiffArray<T> extends Array<{ Field: keyof T, From: T[keyof T], To: 
 }
 
 function equals(x, y) {
+	if (x == undefined || y == undefined) return true;
 	if (x == y) return true;
 	if (!(x instanceof Object) || !(y instanceof Object)) return false;
 	if (x.constructor !== y.constructor) return false;

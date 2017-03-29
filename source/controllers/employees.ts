@@ -9,7 +9,7 @@ import { hash } from './login';
 export = (app: express.Application) => {
 	app.get("/employees", helpers.wrap(async (req, res) => {
 		if (!req.token.permissions['employee.edit']) return helpers.render(res, '401');
-		
+
 		var page = +req.query['page'] || 1;
 		var maxEntries = 20;
 
@@ -31,7 +31,7 @@ export = (app: express.Application) => {
 
 	app.get("/employee/:EmployeeId", helpers.wrap(async (req, res) => {
 		if (!req.token.permissions['employee.edit']) return helpers.render(res, '401');
-		
+
 		if (req.params['EmployeeId'] == "new") {
 			return helpers.render(res, 'employee', {
 				title: "New Employee",
@@ -47,20 +47,22 @@ export = (app: express.Application) => {
 			if (!employee) {
 				return helpers.render(res, '404');
 			}
-			else {
-				return helpers.render(res, "employee", {
-					title: employee.Username,
-					isNew: false,
-					allPermissions: Employee.allPermissions,
-					employee
-				})
-			}
+
+			var events = await EventLog.find({ EmployeeId: employee.EmployeeId }, 10, 0, "-Timestamp");
+
+			return helpers.render(res, "employee", {
+				title: employee.Username,
+				isNew: false,
+				allPermissions: Employee.allPermissions,
+				employee,
+				events
+			})
 		}
 	}));
 
 	app.post("/employee/:EmployeeId", helpers.wrap(async (req, res) => {
 		if (!req.token.permissions['employee.edit']) return helpers.render(res, '401');
-		
+
 		var passHash;
 		if (req.body.Password) {
 			passHash = hash(req.body.Username, req.body.Password)
@@ -83,10 +85,10 @@ export = (app: express.Application) => {
 			if (passHash) req.body.PassHash = passHash;
 			else req.body.PassHash = oldEmployee.PassHash;
 			req.body.Disabled = oldEmployee.Disabled;
-			
+
 			var employee = await Employee.construct(req.body);
 			await employee.save();
-			
+
 			var diffs = helpers.diff(oldEmployee, employee);
 			diffs.fieldsToHide.push("PassHash");
 			await EventLog.createLog(req.token.id, "edited employee '" + oldEmployee.Username + "': " + diffs.toString());
@@ -95,21 +97,21 @@ export = (app: express.Application) => {
 
 	app.post("/employee/:EmployeeId/disable", helpers.wrap(async (req, res) => {
 		if (!req.token.permissions['employee.edit']) return helpers.render(res, '401');
-		
+
 		var employee = await Employee.findOne({ EmployeeId: req.params['EmployeeId'] });
 		employee.Disabled = true;
 		await employee.save();
-		
+
 		await EventLog.createLog(req.token.id, "disabled employee '" + employee.Username + "'");
 	}))
 
 	app.post("/employee/:EmployeeId/enable", helpers.wrap(async (req, res) => {
 		if (!req.token.permissions['employee.edit']) return helpers.render(res, '401');
-		
+
 		var employee = await Employee.findOne({ EmployeeId: req.params['EmployeeId'] });
 		employee.Disabled = false;
 		await employee.save();
-		
+
 		await EventLog.createLog(req.token.id, "enabled employee '" + employee.Username + "'");
 	}))
 }

@@ -24,6 +24,9 @@
 		<a href="/employees">Employees</a>
 	</li>
 	<% } %>
+	<li <%- (path.indexOf("/eventlog") == 0 ? 'class="active"' : "")%>>
+		<a href="/eventlog">Event Log</a>
+	</li>
 	<hr>
 	<li>
 		<a href="/logout">Logout</a>

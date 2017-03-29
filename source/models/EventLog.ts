@@ -27,10 +27,14 @@ class EventLog {
 	}
 
 	private static builder = queryBuilder<EventLog>("EventLog")
-	static async find(query: query<EventLog> = {}) {
-		var sql = this.builder(query);
+	static async find(query: query<EventLog> = {}, limit?: number, offset?: number, sort?: string) {
+		var sql = this.builder(query, limit, offset, sort);
 		var results = await database.query<any>(sql);
 		return Promise.all(results.map(this.construct))
+	}
+	
+	static async count() {
+		return (await database.query<{ count: number }>("SElECT COUNT(*) as count FROM EventLog"))[0].count;
 	}
 
 	static async findOne(query: query<EventLog>) {
