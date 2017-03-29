@@ -17,6 +17,9 @@
 			<li <%- (path.indexOf("/reports/income-statement") == 0 ? 'class="active"' : "")%>>
 				<a href="/reports/income-statement">Income Statment</a>
 			</li>
+			<li <%- (path.indexOf("/reports/balance-sheet") == 0 ? 'class="active"' : "")%>>
+				<a href="/reports/balance-sheet">Balance Sheet</a>
+			</li>
 		</ul>
 	</li>
 	<% if (user.permissions['employee.edit']) { %>
