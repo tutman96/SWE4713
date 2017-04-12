@@ -7,8 +7,8 @@ show event log working
 √ three line heading on reports
 √ double ruling at the bottom in income statement
 √ Create Subcategories**
-create statement of retained earnings**
-	dividends can be 0
+√ create statement of retained earnings**
+√	dividends can be 0
 √ add journal entry categories (standard, adjusting, closing)
-add statement of retained earnings**
+√ add statement of retained earnings**
 add ratios and dashboard**

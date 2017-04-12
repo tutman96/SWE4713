@@ -101,7 +101,8 @@ export = (app: express.Application) => {
 				CreatedDate BETWEEN ? AND ? AND 
 				State = "APPROVED" AND
 				Account.Active = 1 AND 
-				(AccountType.AccountType = 'Expense' OR AccountType.AccountType = 'Revenue')
+				(AccountType.AccountType = 'Expense' OR AccountType.AccountType = 'Revenue') AND
+				(Entry.Type != 'CLOSING')
 			GROUP BY AccountNumber 
 			ORDER BY IncreaseEntry DESC, SortOrder ASC`, [startDate, endDate])
 
@@ -172,6 +173,40 @@ export = (app: express.Application) => {
 			totalLiabilities,
 			totalEquities,
 
+			startDate,
+			endDate
+		})
+	}))
+	
+	app.get("/reports/retained-earnings", helpers.wrap(async (req, res) => {
+		var startDate = (req.query['startDate'] ? new Date(req.query['startDate']) : new Date(0));
+		var endDate = (req.query['endDate'] ? new Date(req.query['endDate']) : new Date());
+
+		var balances = await database.query<{ AccountNumber: number, AccountName: string, AccountType: "Revenue" | "Expense", Value: number }>(`
+		SELECT AccountNumber, AccountName, AccountType, COALESCE(SUM(Value),0) as Value FROM Account 
+			LEFT JOIN Transaction USING (AccountNumber) 
+			LEFT JOIN Entry USING (EntryId)
+			JOIN AccountType USING (AccountType)
+  			WHERE 
+				CreatedDate BETWEEN ? AND ? AND 
+				State = "APPROVED" AND
+				Account.Active = 1 AND 
+				(AccountType.AccountType = 'Expense' OR AccountType.AccountType = 'Revenue') AND
+				(Entry.Type != 'CLOSING')
+			GROUP BY AccountNumber 
+			ORDER BY IncreaseEntry DESC, SortOrder ASC`, [startDate, endDate])
+
+		var revenues = balances.filter((b) => b.AccountType == "Revenue");
+		var expenses = balances.filter((b) => b.AccountType == "Expense")
+		
+		var income = revenues.reduce((sum, r) => sum + r.Value, 0) - expenses.reduce((sum, e) => sum + e.Value, 0);
+		var dividends = 0;
+		
+
+		return helpers.render(res, 'reports/retained-earnings', {
+			title: "Statement of Retained Earnings",
+			income,
+			dividends,
 			startDate,
 			endDate
 		})

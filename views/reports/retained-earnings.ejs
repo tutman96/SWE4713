@@ -1,0 +1,29 @@
+<%- include('../partials/header') %>
+
+<%- include ../partials/reportHeader %>
+
+
+<div style="max-width:500px;margin:0 auto">
+	<center>
+		Adaams &amp; Family Inc.<br>
+		<%=title%><br>
+		At <%=dateFormat(endDate, 'LL')%>
+	</center>
+	
+	<table class="table table-striped table-condensed">
+		<tr>
+			<td>Net Income</td>
+			<td class="text-right col-xs-3"><%-balanceFormat(income)%></td>
+		</tr>
+		<tr>
+			<td>Dividends</td>
+			<td class="text-right col-xs-3"><%-balanceFormat(-dividends).replace("$","")%></td>
+		</tr>
+		<tr>
+			<th>Retained Earnings</th>
+			<th class="text-right col-xs-3" style="border-bottom:4px double #999; border-top: 1px solid #999"><%-balanceFormat(income).replace("$","")%></th>
+		</tr>
+	</table>
+</div>
+
+<%- include('../partials/footer') %>
