@@ -18,6 +18,47 @@ export = (app: express.Application) => {
   			WHERE 
 				(CreatedDate BETWEEN ? AND ?) AND 
 				State = "APPROVED" AND
+				Account.Active = 1 AND
+				(Type = "STANDARD" OR Type = "ADJUSTING")
+			GROUP BY AccountNumber 
+			ORDER BY SortOrder ASC`, [startDate, endDate])
+
+		// var totalDebit = balances.filter((b) => b.IncreaseEntry == "DEBIT").map((b) => b.Value).reduce((prev, current) => prev + current, 0);
+		// var totalCredit = balances.filter((b) => b.IncreaseEntry == "CREDIT").map((b) => b.Value).reduce((prev, current) => prev + current, 0);
+		var totalDebit = 0;
+		var totalCredit = 0;
+
+		balances.forEach((balance) => {
+			if ((balance.IncreaseEntry == "CREDIT" && balance.Value > 0) || (balance.IncreaseEntry == "DEBIT" && balance.Value < 0)) {
+				totalCredit += Math.abs(balance.Value)
+			}
+			else if ((balance.IncreaseEntry == "DEBIT" && balance.Value > 0) || (balance.IncreaseEntry == "CREDIT" && balance.Value < 0)) {
+				totalDebit += Math.abs(balance.Value)
+			}
+		})
+
+		return helpers.render(res, 'reports/trial-balance', {
+			title: "Adjusted Trial Balance",
+			totalDebit,
+			totalCredit,
+			startDate,
+			endDate,
+			balances
+		})
+	}))
+	
+	app.get("/reports/closing-balance", helpers.wrap(async (req, res) => {
+		var startDate = (req.query['startDate'] ? new Date(req.query['startDate']) : new Date(0));
+		var endDate = (req.query['endDate'] ? new Date(req.query['endDate']) : new Date());
+
+		var balances = await database.query<{ AccountNumber: number, AccountName: string, IncreaseEntry: "CREDIT" | "DEBIT", Value: number }>(`
+		SELECT AccountNumber, AccountName, IncreaseEntry, SUM(Value) as Value FROM Account 
+			JOIN Transaction USING (AccountNumber) 
+			JOIN Entry USING (EntryId)
+			JOIN AccountType USING (AccountType)
+  			WHERE 
+				(CreatedDate BETWEEN ? AND ?) AND 
+				State = "APPROVED" AND
 				Account.Active = 1
 			GROUP BY AccountNumber 
 			ORDER BY SortOrder ASC`, [startDate, endDate])
@@ -37,7 +78,7 @@ export = (app: express.Application) => {
 		})
 
 		return helpers.render(res, 'reports/trial-balance', {
-			title: "Trial Balance",
+			title: "Post-Closing Trial Balance",
 			totalDebit,
 			totalCredit,
 			startDate,
@@ -45,7 +86,7 @@ export = (app: express.Application) => {
 			balances
 		})
 	}))
-
+	
 
 	app.get("/reports/income-statement", helpers.wrap(async (req, res) => {
 		var startDate = (req.query['startDate'] ? new Date(req.query['startDate']) : new Date(0));

@@ -9,6 +9,7 @@ class Entry {
 	Description: string;
 	CreatedDate: Date;
 	State: "PENDING" | "APPROVED" | "DECLINED";
+	Type: "STANDARD" | "ADJUSTING" | "CLOSING";
 	DeclinedReason: string;
 
 	transactions?: Array<Transaction>;
@@ -18,6 +19,7 @@ class Entry {
 		var j = new Entry();
 		j.EntryId = props.EntryId;
 		j.State = props.State || "PENDING";
+		j.Type = props.Type;
 		j.Description = props.Description;
 		j.CreatedDate = new Date(props.CreatedDate);
 		j.DeclinedReason = props.DeclinedReason;
@@ -60,8 +62,8 @@ class Entry {
 	}
 
 	static async create(entry: Entry) {
-		var res = await database.query("INSERT INTO Entry (Description, CreatedDate, State) VALUES (?,?,?)",
-			[entry.Description, entry.CreatedDate, "PENDING"])
+		var res = await database.query("INSERT INTO Entry (Description, CreatedDate, State, Type) VALUES (?,?,?,?)",
+			[entry.Description, entry.CreatedDate, "PENDING", entry.Type])
 		
 		entry.EntryId = res.insertId;
 		
@@ -72,8 +74,8 @@ class Entry {
 	}
 
 	async save() {
-		await database.query("UPDATE Entry SET Description = ?, CreatedDate = ?, State = ?, DeclinedReason = ? WHERE EntryId = ?",
-			[this.Description, this.CreatedDate, this.State, this.DeclinedReason, this.EntryId]);
+		await database.query("UPDATE Entry SET Description = ?, CreatedDate = ?, State = ?, DeclinedReason = ?, Type = ? WHERE EntryId = ?",
+			[this.Description, this.CreatedDate, this.State, this.DeclinedReason, this.Type, this.EntryId]);
 
 		var oldTransactions = await Transaction.find({ EntryId: this.EntryId });
 

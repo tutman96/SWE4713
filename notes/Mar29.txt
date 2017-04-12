@@ -9,6 +9,6 @@ show event log working
 Create Subcategories**
 create statement of retained earnings**
 	dividends can be 0
-add journal entry categories (standard, adjusting, closing)
+√ add journal entry categories (standard, adjusting, closing)
 add statement of retained earnings**
 add ratios and dashboard**

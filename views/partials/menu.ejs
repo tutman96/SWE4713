@@ -12,7 +12,10 @@
 		<a>Reports</a>
 		<ul>
 			<li <%- (path.indexOf("/reports/trial-balance") == 0 ? 'class="active"' : "")%>>
-				<a href="/reports/trial-balance">Trial Balance</a>
+				<a href="/reports/trial-balance">Adjusted Trial Balance</a>
+			</li>
+			<li <%- (path.indexOf("/reports/closing-balance") == 0 ? 'class="active"' : "")%>>
+				<a href="/reports/closing-balance">Post-Closing Trial Balance</a>
 			</li>
 			<li <%- (path.indexOf("/reports/income-statement") == 0 ? 'class="active"' : "")%>>
 				<a href="/reports/income-statement">Income Statment</a>
