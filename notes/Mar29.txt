@@ -4,8 +4,8 @@
 √ change 'edit' to 'details' on posted entries
 attach a supporting document next time to demonstrate functionality
 show event log working
-three line heading on reports
-double ruling at the bottom in income statement
+√ three line heading on reports
+√ double ruling at the bottom in income statement
 Create Subcategories**
 create statement of retained earnings**
 	dividends can be 0
