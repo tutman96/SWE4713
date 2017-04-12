@@ -1,15 +1,16 @@
 <nav>
 	<ul class="pager">
-		<% if (page > 1) { %><li class="previous"><a href="<%=path%>?page=<%=page - 1%>">&larr; Previous Page</a></li><% } %>
+		<% if (page > 1) { %><li class="previous"><a href="#" onclick="nextPage(); return false">&larr; Previous Page</a></li><% } %>
 		<% if (page == 1) { %><li class="previous disabled"><a>&larr; Previous Page</a></li><% } %>
 		<li style="line-height: 35px;">Page <%=page%> of <%=totalPages%></li>
-		<% if (page < totalPages) { %><li class="next"><a href="<%=path%>?page=<%=page + 1%>">Next Page &rarr;</a></li><% } %>
+		<% if (page < totalPages) { %><li class="next"><a href="#" onclick="nextPage(); return false">Next Page &rarr;</a></li><% } %>
 		<% if (page == totalPages) { %><li class="next disabled"><a>Next Page &rarr;</a></li><% } %>
 	</ul>
 </nav>
 
 <script>
 	var sortText = "<%=sort.toLowerCase()%>"
+	var page = <%=page%>
 	function updateQueryStringParameter(uri, key, value) {
 		var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i"); 
 		var separator = uri.indexOf('?') !== -1 ? "&" : "?"; 
@@ -41,4 +42,12 @@
 			location.search = updateQueryStringParameter(location.search, "sort", (asc ? "-" : "") + column);
 		})
 	})
+	
+	function nextPage() {
+		location.search = updateQueryStringParameter(location.search, "page", page + 1)
+	}
+	
+	function previousPage() {
+		location.search = updateQueryStringParameter(location.search, "page", page - 1)
+	}
 </script>

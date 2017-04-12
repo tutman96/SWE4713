@@ -53,12 +53,10 @@
 <tr>
 	<% } %>
 	<td>
-		<% if (entry.Type == "STANDARD") { %>
-			<span class="label label-primary"><%=entry.Type%></span>
+		<% if (entry.Type == "CLOSING") { %>
+			<span class="label label-warning"><%=entry.Type%></span>
 		<% } else if (entry.Type == "ADJUSTING") { %>
 			<span class="label label-info"><%=entry.Type%></span>
-		<% } else { %>
-			<span class="label label-warning"><%=entry.Type%></span>
 		<% } %>
 		<%=entry.Description%>
 	</td>
