@@ -46,7 +46,7 @@ export = (app: express.Application) => {
 			balances
 		})
 	}))
-	
+
 	app.get("/reports/closing-balance", helpers.wrap(async (req, res) => {
 		var startDate = (req.query['startDate'] ? new Date(req.query['startDate']) : new Date(0));
 		var endDate = (req.query['endDate'] ? new Date(req.query['endDate']) : new Date());
@@ -86,7 +86,7 @@ export = (app: express.Application) => {
 			balances
 		})
 	}))
-	
+
 
 	app.get("/reports/income-statement", helpers.wrap(async (req, res) => {
 		var startDate = (req.query['startDate'] ? new Date(req.query['startDate']) : new Date(0));
@@ -121,8 +121,8 @@ export = (app: express.Application) => {
 		var startDate = (req.query['startDate'] ? new Date(req.query['startDate']) : new Date(0));
 		var endDate = (req.query['endDate'] ? new Date(req.query['endDate']) : new Date());
 
-		var balances = await database.query<{ AccountNumber: number, AccountName: string, AccountType: "Asset" | "Liability" | "Equity", Value: number }>(`
-		SELECT AccountNumber, AccountName, AccountType, COALESCE(SUM(Value),0) as Value FROM Account 
+		var balances = await database.query<{ AccountNumber: number, AccountName: string, AccountType: "Asset" | "Liability" | "Equity", SubAccountType: string, Value: number }>(`
+		SELECT AccountNumber, AccountName, AccountType, SubAccountType, COALESCE(SUM(Value),0) as Value FROM Account 
 			LEFT JOIN Transaction USING (AccountNumber) 
 			LEFT JOIN Entry USING (EntryId)
 			JOIN AccountType USING (AccountType)
@@ -132,51 +132,46 @@ export = (app: express.Application) => {
 				Account.Active = 1 AND 
 				(AccountType.AccountType = 'Asset' OR AccountType.AccountType = 'Liability' OR AccountType.AccountType = 'Equity')
 			GROUP BY AccountNumber 
-			ORDER BY IncreaseEntry DESC, SortOrder ASC`, [startDate, endDate])
+			ORDER BY IncreaseEntry DESC, SubAccountType ASC, SortOrder ASC`, [startDate, endDate])
 
-		var assets = balances.filter((b) => b.AccountType == "Asset");
+		var assets = balances.filter((b) => b.AccountType == "Asset")
 		var liabilities = balances.filter((b) => b.AccountType == "Liability")
 		var equities = balances.filter((b) => b.AccountType == "Equity")
+		
+		var assetSubTypes = assets.reduce((subTypes, a) => {
+			if (subTypes.indexOf(a.SubAccountType) == -1) subTypes.push(a.SubAccountType);
+			return subTypes;
+		}, new Array<string>())
+		
+		var liabilitiesSubTypes = liabilities.reduce((subTypes, l) => {
+			if (subTypes.indexOf(l.SubAccountType) == -1) subTypes.push(l.SubAccountType);
+			return subTypes;
+		}, new Array<string>())
+		
+		var equitiesSubTypes = equities.reduce((subTypes, e) => {
+			if (subTypes.indexOf(e.SubAccountType) == -1) subTypes.push(e.SubAccountType);
+			return subTypes;
+		}, new Array<string>())
 
 		var totalAssets = assets.reduce((total, asset) => total + asset.Value, 0);
 		var totalLiabilities = liabilities.reduce((total, liability) => total + liability.Value, 0);
 		var totalEquities = equities.reduce((total, equity) => total + equity.Value, 0);
 
-		var { TotalRevenue, TotalExpense } = (await database.query<{ TotalRevenue: number, TotalExpense: number }>(`SELECT (
-			SELECT COALESCE(SUM(Value),0) FROM Account
-			LEFT JOIN Transaction USING (AccountNumber) 
-			LEFT JOIN Entry USING (EntryId)
-			JOIN AccountType USING (AccountType)
-					WHERE 
-				CreatedDate BETWEEN ? AND ? AND 
-				State = "APPROVED" AND
-				Account.Active = 1 AND Account.AccountType = 'Revenue'
-		) as TotalRevenue, (
-			SELECT COALESCE(SUM(Value),0) FROM Account
-			LEFT JOIN Transaction USING (AccountNumber) 
-			LEFT JOIN Entry USING (EntryId)
-			JOIN AccountType USING (AccountType)
-					WHERE 
-				CreatedDate BETWEEN ? AND ? AND 
-				State = "APPROVED" AND
-				Account.Active = 1 AND Account.AccountType = 'Expense'
-		) as TotalExpense`, [startDate, endDate, startDate, endDate]))[0]
-		
-		var retainedEarnings = TotalRevenue - TotalExpense;
-		totalEquities += retainedEarnings;
-		
 		return helpers.render(res, 'reports/balance-sheet', {
 			title: "Balance Sheet",
 			assets,
 			liabilities,
 			equities,
+			
+			liabilitiesSubTypes,
+			assetSubTypes,
+			equitiesSubTypes,
 
 			totalAssets,
+			
 			totalLiabilities,
 			totalEquities,
 
-			retainedEarnings,
-			
 			startDate,
 			endDate
 		})

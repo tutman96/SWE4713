@@ -13,29 +13,58 @@
 	<table class="table table-striped table-condensed">
 		<thead>
 			<tr>
-				<th colspan="2">Assets</th>
+				<th colspan="3">Assets</th>
 			</tr>
 		</thead>
-		<% var firstAccountDollarSign = true; %>
-		<% for (var balance of assets) { %>
-			<tr>
-				<td><a href="/account/<%=balance.AccountNumber%>"><%=balance.AccountName%></a></td>
-				<td class="text-right col-sm-3">
-					<% if (firstAccountDollarSign) { %>
-						<%-balanceFormat(balance.Value)%>
-						<% firstAccountDollarSign = false %>
-					<% } else { %>
-						<%-balanceFormat(balance.Value).replace("$","")%>
-					<% } %>
-				</td>
-			</tr>
+		<% var totals = 0 %>
+		
+		<% var firstAccountDollarSign = true; var firstTotalDollarSign = true; %>
+		<% for (var subType of assetSubTypes) { %>
+			<% if (subType != '') { 
+				totals = 0; %>
+				<tr>
+					<td colspan="3"><%=subType%></td>
+				</tr>
+			<% } %>
+			<% for (var balance of assets) { 
+				if (balance.SubAccountType != subType) continue; %>
+				<% totals += balance.Value %>
+				<tr>
+					<td><a href="/account/<%=balance.AccountNumber%>" <%-(subType != '' ? 'style="padding-left:2em"' : "")%>><%=balance.AccountName%></a></td>
+					<td class="text-right col-sm-3" <%-(subType == '' ? 'colspan="2"' : "")%>>
+						<% if ((subType != '' && firstAccountDollarSign) || (subType == '' && firstTotalDollarSign)) { %>
+							<%-balanceFormat(balance.Value)%>
+							<% if ((subType != '' && firstAccountDollarSign)) firstAccountDollarSign = false
+						   else firstTotalDollarSign = false %>
+						<% } else { %>
+							<%-balanceFormat(balance.Value).replace("$","")%>
+						<% } %>
+					</td>
+					<% if (subType != '') { %> <td></td> <% } %>
+				</tr>
+			<% } %>
+			<% if (subType != '') { %>
+				<tr>
+					<td><%=subType%> Total</td>
+					<td style="border-top:1px solid #999"></td>
+					<th class="text-right col-sm-3">
+						<% if (firstTotalDollarSign) { %>
+							<%-balanceFormat(totals)%>
+							<% firstTotalDollarSign = false %>
+						<% } else { %>
+							<%-balanceFormat(totals).replace("$","")%>
+						<% } %>
+					</th>
+				</tr>
+			<% } %>
 		<% } %>
 		<tr>
 			<th>Total Assets</th>
+			<th></th>
 			<th class="text-right col-sm-3" style="border-bottom:4px double #999;border-top:1px solid #999">
-				<% if (firstAccountDollarSign) { %>
+				<% if (firstTotalDollarSign) { %>
 					<%-balanceFormat(totalAssets)%>
-					<% firstAccountDollarSign = false %>
+					<% firstTotalDollarSign = false %>
 				<% } else { %>
 					<%-balanceFormat(totalAssets).replace("$","")%>
 				<% } %>
@@ -51,25 +80,52 @@
 			</tr>
 		</thead>
 		<% var firstAccountDollarSign = true; %>
-		<% for (var balance of liabilities) { %>
+		<% for (var subType of liabilitiesSubTypes) { %>
+		<% if (subType != '') { 
+				totals = 0; %>
 			<tr>
-				<td><a href="/account/<%=balance.AccountNumber%>"><%=balance.AccountName%></a></td>
-				<td class="text-right col-sm-3">
-					<% if (firstAccountDollarSign) { %>
+				<td colspan="3"><%=subType%></td>
+			</tr>
+		<% } %>
+		<% for (var balance of liabilities) { 
+			if (balance.SubAccountType != subType) continue; %>
+			<% totals += balance.Value %>
+			<tr>
+				<td><a href="/account/<%=balance.AccountNumber%>" <%-(subType != '' ? 'style="padding-left:2em"' : "")%>><%=balance.AccountName%></a></td>
+				<td class="text-right col-sm-3" <%-(subType == '' ? 'colspan="2"' : "")%>>
+					<% if ((subType != '' && firstAccountDollarSign) || (subType == '' && firstTotalDollarSign)) { %>
 						<%-balanceFormat(balance.Value)%>
-						<% firstAccountDollarSign = false %>
+						<% if ((subType != '' && firstAccountDollarSign)) firstAccountDollarSign = false
+						   else firstTotalDollarSign = false %>
 					<% } else { %>
 						<%-balanceFormat(balance.Value).replace("$","")%>
 					<% } %>
 				</td>
+				<% if (subType != '') { %> <td></td> <% } %>
 			</tr>
+			<% } %>
+			<% if (subType != '') { %>
+				<tr>
+					<td><%=subType%> Total</td>
+					<td style="border-top:1px solid #999"></td>
+					<th class="text-right col-sm-3">
+						<% if (firstTotalDollarSign) { %>
+							<%-balanceFormat(totals)%>
+							<% firstTotalDollarSign = false %>
+						<% } else { %>
+							<%-balanceFormat(totals).replace("$","")%>
+						<% } %>
+					</th>
+				</tr>
+			<% } %>
 		<% } %>
 		<tr>
 			<th>Total Liabilities</th>
+			<th></th>
 			<th class="text-right col-sm-3" style="border-bottom:1px solid #999;border-top:1px solid #999">
-				<% if (firstAccountDollarSign) { %>
+				<% if (firstTotalDollarSign) { %>
 					<%-balanceFormat(totalLiabilities)%>
-					<% firstAccountDollarSign = false %>
+					<% firstTotalDollarSign = false %>
 				<% } else { %>
 					<%-balanceFormat(totalLiabilities).replace("$","")%>
 				<% } %>
@@ -80,40 +136,56 @@
 	<table class="table table-striped table-condensed">
 		<thead>
 			<tr>
-				<th colspan="3">Equity</th>
+				<td colspan="3"><%=subType%></td>
 			</tr>
 		</thead>
-		<% var firstAccountDollarSign = true; %>
-		<% for (var balance of equities) { %>
-			<tr>
-				<td><a href="/account/<%=balance.AccountNumber%>"><%=balance.AccountName%></a></td>
-				<td class="text-right col-sm-3">
-					<% if (firstAccountDollarSign) { %>
-						<%-balanceFormat(balance.Value)%>
-						<% firstAccountDollarSign = false %>
-					<% } else { %>
-						<%-balanceFormat(balance.Value).replace("$","")%>
-					<% } %>
-				</td>
-			</tr>
+		<% var firstAccountDollarSign = true %>
+		<% for (var subType of equitiesSubTypes) { %>
+			<% if (subType != '') { 
+				totals = 0; %>
+				<tr>
+					<td><%=subType%></td><td></td>
+				</tr>
+			<% } %>
+			<% for (var balance of equities) {
+				if (balance.SubAccountType != subType) continue; %>
+				<% totals += balance.Value %>
+				<tr>
+					<td><a href="/account/<%=balance.AccountNumber%>" <%-(subType != '' ? 'style="padding-left:2em"' : "")%>><%=balance.AccountName%></a></td>
+					<td class="text-right col-sm-3" <%-(subType == '' ? 'colspan="2"' : "")%>>
+						<% if ((subType != '' && firstAccountDollarSign) || (subType == '' && firstTotalDollarSign)) { %>
+							<%-balanceFormat(balance.Value)%>
+							<% if ((subType != '' && firstAccountDollarSign)) firstAccountDollarSign = false
+						    else firstTotalDollarSign = false %>
+						<% } else { %>
+							<%-balanceFormat(balance.Value).replace("$","")%>
+						<% } %>
+					</td>
+					<% if (subType != '') { %> <td></td> <% } %>
+				</tr>
+			<% } %>
+			<% if (subType != '') { %>
+				<tr>
+					<td><%=subType%> Total</td>
+					<td style="border-top:1px solid #999"></td>
+					<th class="text-right col-sm-3">
+						<% if (firstTotalDollarSign) { %>
+							<%-balanceFormat(totals)%>
+							<% firstTotalDollarSign = false %>
+						<% } else { %>
+							<%-balanceFormat(totals).replace("$","")%>
+						<% } %>
+					</th>
+				</tr>
+			<% } %>
 		<% } %>
 		<tr>
-			<td>Retained Earnings</td>
-			<td class="text-right col-sm-3">
-				<% if (firstAccountDollarSign) { %>
-					<%-balanceFormat(retainedEarnings)%>
-					<% firstAccountDollarSign = false %>
-				<% } else { %>
-					<%-balanceFormat(retainedEarnings).replace("$","")%>
-				<% } %>
-			</td>
-		</tr>
-		<tr>
 			<th>Total Equity</th>
+			<th></th>
 			<th class="text-right col-sm-3" style="border-bottom:1px solid #999;border-top:1px solid #999">
-				<% if (firstAccountDollarSign) { %>
+				<% if (firstTotalDollarSign) { %>
 					<%-balanceFormat(totalEquities)%>
-					<% firstAccountDollarSign = false %>
+					<% firstTotalDollarSign = false %>
 				<% } else { %>
 					<%-balanceFormat(totalEquities).replace("$","")%>
 				<% } %>

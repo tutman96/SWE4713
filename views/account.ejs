@@ -20,10 +20,16 @@
 			<select class="form-control" name="AccountType" <%= transactions.length ? "disabled" : ""%>>
 				<% for (var accountType of accountTypes) { %>
 					<option value="<%=accountType.AccountType%>" <%-account.AccountType && (account.AccountType.AccountType == accountType.AccountType ? "selected" : "")%>>
-						<%=accountType.AccountType%> (#<%=accountType.MinCode%> - <%=accountType.MaxCode%>)
+						<%=accountType.toString()%>
 					</option>
 				<% } %>
 			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Sub Account Type</label>
+		<div class="col-sm-10">
+			<input type="text" class="form-control" name="SubAccountType" value="<%=account.SubAccountType%>" <%= transactions.length ? "readonly" : ""%>>
 		</div>
 	</div>
 	<div class="form-group">
@@ -93,6 +99,7 @@
 		var formData = {
 			AccountNumber: +$("input[name=AccountNumber]").val(),
 			AccountType: $("select[name=AccountType]").val(),
+			SubAccountType: $("input[name=SubAccountType]").val(),
 			AccountName: $("input[name=AccountName]").val(),
 			SortOrder: +$("input[name=SortOrder]").val(),
 			Active: !!$("input[name=Active]").prop('checked')

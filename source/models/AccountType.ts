@@ -29,4 +29,8 @@ class AccountType {
 		var results = await database.query<any>(sql);
 		return results.length && this.construct(results[0]);
 	}
+	
+	toString() {
+		return this.AccountType + " (#" + this.MinCode + " - #" + this.MaxCode + ")"
+	}
 }

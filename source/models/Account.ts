@@ -6,6 +6,7 @@ import AccountType = require('./AccountType');
 class Account {
 	AccountNumber: number;
 	AccountType: AccountType;
+	SubAccountType: string;
 	AccountName: string;
 	SortOrder: number;
 	Active: boolean;
@@ -18,7 +19,7 @@ class Account {
 
 		var accountType: string = <any>props.AccountType;
 		at.AccountType = await AccountType.findOne({ AccountType: accountType });
-
+		at.SubAccountType = props.SubAccountType;
 		at.AccountName = props.AccountName;
 		at.SortOrder = props.SortOrder;
 		at.Active = (typeof props.Active == "string" ? (props.Active == "true") : !!props.Active);
@@ -45,13 +46,13 @@ class Account {
 	}
 
 	static async create(account: Account) {
-		await database.query("INSERT INTO Account (AccountNumber, AccountType, AccountName, SortOrder, Active, CreatedTime, CreatedBy) VALUES (?,?,?,?,?,NOW(),?)",
-			[account.AccountNumber, account.AccountType.AccountType, account.AccountName, account.SortOrder, +account.Active, account.CreatedBy])
+		await database.query("INSERT INTO Account (AccountNumber, AccountType, SubAccountType, AccountName, SortOrder, Active, CreatedTime, CreatedBy) VALUES (?,?,?,?,?,?,NOW(),?)",
+			[account.AccountNumber, account.AccountType.AccountType, account.SubAccountType, account.AccountName, account.SortOrder, +account.Active, account.CreatedBy])
 	}
 	
 	async save() {		
-		await database.query("UPDATE Account SET AccountType = ?, AccountName = ?, SortOrder = ?, Active = ? WHERE AccountNumber = ?",
-			[this.AccountType.AccountType, this.AccountName, this.SortOrder, +this.Active, this.AccountNumber])
+		await database.query("UPDATE Account SET AccountType = ?, SubAccountType = ?, AccountName = ?, SortOrder = ?, Active = ? WHERE AccountNumber = ?",
+			[this.AccountType.AccountType, this.SubAccountType, this.AccountName, this.SortOrder, +this.Active, this.AccountNumber])
 	}
 	
 	async delete() {
