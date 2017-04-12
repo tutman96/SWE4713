@@ -21,14 +21,38 @@ export = (app: express.Application) => {
 			var totalDebits = 0;
 			var totalCredits = 0;
 
-			e.transactions.forEach((t) => {
+			e.transactions = e.transactions.map((t) => {
 				if ((t.account.AccountType.IncreaseEntry == "CREDIT" && t.Value > 0) || (t.account.AccountType.IncreaseEntry == "DEBIT") && t.Value < 0) {
 					totalCredits += Math.abs(t.Value);
+					return {
+						...t,
+						Value: Math.abs(t.Value),
+						account: {
+							...t.account,
+							AccountType: {
+								...t.account.AccountType,
+								IncreaseEntry: "CREDIT" as any
+							}
+						}
+					} as any
 				}
 				else {
 					totalDebits += Math.abs(t.Value);
+					return {
+						...t,
+						Value: Math.abs(t.Value),
+						account: {
+							...t.account,
+							AccountType: {
+								...t.account.AccountType,
+								IncreaseEntry: "DEBIT"
+							}
+						}
+					} as any
 				}
 			})
+
+			e.transactions = e.transactions.sort((a, b) => (a.account.AccountType.IncreaseEntry == "DEBIT" ? -1 : 1))
 
 			return {
 				...e,
@@ -65,6 +89,20 @@ export = (app: express.Application) => {
 			if (!entry) {
 				return helpers.render(res, '404')
 			}
+
+			entry.transactions = entry.transactions.map((t) => ({
+				...t,
+				Value: Math.abs(t.Value),
+				account: {
+					...t.account,
+					AccountType: {
+						...t.account.AccountType,
+						IncreaseEntry: ((t.account.AccountType.IncreaseEntry == "CREDIT" && t.Value > 0) || (t.account.AccountType.IncreaseEntry == "DEBIT") && t.Value < 0 ? "CREDIT" : "DEBIT")
+					}
+				}
+			} as any))
+
+			entry.transactions = entry.transactions.sort((a, b) => (a.account.AccountType.IncreaseEntry == "DEBIT" ? -1 : 1))
 
 			return helpers.render(res, 'entry', {
 				title: entry.Description,

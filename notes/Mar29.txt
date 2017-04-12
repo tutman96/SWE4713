@@ -1,5 +1,5 @@
-debits come before credits (debit entries, not accounts)
-	credits are indented
+√ debits come before credits (debit entries, not accounts)
+√	credits are indented
 remove entry totals from entries page
 change 'edit' to 'details' on posted entries
 attach a supporting document next time to demonstrate functionality
