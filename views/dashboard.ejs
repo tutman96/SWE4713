@@ -1,0 +1,156 @@
+<%- include('partials/header') %>
+<span class="title"><%= title %></span>
+<br><br>
+<div class="row" style="margin: 0 auto; max-width: 1200px">
+	<div class="col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Asset Turnover Ratios
+			</div>
+			<table class="table table-hover table-condensed">
+				<thead>
+					<tr>
+						<th class="col-sm-2"></th>
+						<% for (var d of data) { %>
+							<th><%=dateFormat(new Date(d.Year, d.Month - 1), 'MMM YYYY')%></th>
+						<% } %>
+					</tr>
+				</thead>
+				<tr>
+					<th class="col-sm-2">FA TO</th>
+					<% for (var d of data) { %>
+						<td>N/A</td>
+					<% } %>
+				</tr>
+				<tr>
+					<th class="col-sm-2">TA TO</th>
+					<% for (var d of data) { %>
+						<td><%=d.TAT.toFixed(2)%></td>
+					<% } %>
+				</tr>
+			</table>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Debt Ratios
+			</div>
+			<table class="table table-hover table-condensed">
+				<thead>
+					<tr>
+						<th class="col-sm-2"></th>
+						<% for (var d of data) { %>
+							<th><%=dateFormat(new Date(d.Year, d.Month - 1), 'MMM YYYY')%></th>
+						<% } %>
+					</tr>
+				</thead>
+				<tr>
+					<th class="col-sm-2">D/A</th>
+					<% for (var d of data) { %>
+						<td><%=(d.DR * 100).toFixed(1)%>%</td>
+					<% } %>
+				</tr>
+				<tr>
+					<th class="col-sm-2">TIE</th>
+					<% for (var d of data) { %>
+						<td>N/A</td>
+					<% } %>
+				</tr>
+				<tr>
+					<th class="col-sm-2">EC</th>
+					<% for (var d of data) { %>
+						<td>N/A</td>
+					<% } %>
+				</tr>
+			</table>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Profit Margins
+			</div>
+			<table class="table table-hover table-condensed">
+				<thead>
+					<tr>
+						<th class="col-sm-2"></th>
+						<% for (var d of data) { %>
+							<th><%=dateFormat(new Date(d.Year, d.Month - 1), 'MMM YYYY')%></th>
+						<% } %>
+					</tr>
+				</thead>
+				<tr>
+					<th class="col-sm-2">PM</th>
+					<% for (var d of data) { %>
+						<td><%=(d.PM * 100).toFixed(1)%>%</td>
+					<% } %>
+				</tr>
+				<tr>
+					<th class="col-sm-2">OPM</th>
+					<% for (var d of data) { %>
+						<td><%=(d.OPM * 100).toFixed(1)%>%</td>
+					<% } %>
+				</tr>
+				<tr>
+					<th class="col-sm-2">GPM</th>
+					<% for (var d of data) { %>
+						<td><%=(d.GPM * 100).toFixed(1)%>%</td>
+					<% } %>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Earning Power
+			</div>
+			<table class="table table-hover table-condensed">
+				<thead>
+					<tr>
+						<th class="col-sm-2"></th>
+						<% for (var d of data) { %>
+							<th><%=dateFormat(new Date(d.Year, d.Month - 1), 'MMM YYYY')%></th>
+						<% } %>
+					</tr>
+				</thead>
+				<tr>
+					<th class="col-sm-2">BEP</th>
+					<% for (var d of data) { %>
+						<td><%=(d.BEP * 100).toFixed(1)%>%</td>
+					<% } %>
+				</tr>
+			</table>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Returns
+			</div>
+			<table class="table table-hover table-condensed">
+				<thead>
+					<tr>
+						<th class="col-sm-2"></th>
+						<% for (var d of data) { %>
+							<th><%=dateFormat(new Date(d.Year, d.Month - 1), 'MMM YYYY')%></th>
+						<% } %>
+					</tr>
+				</thead>
+				<tr>
+					<th class="col-sm-2">ROA</th>
+					<% for (var d of data) { %>
+						<td><%=(d.ROA * 100).toFixed(1)%>%</td>
+					<% } %>
+				</tr>
+				<tr>
+					<th class="col-sm-2">ROE</th>
+					<% for (var d of data) { %>
+						<td><%=(d.ROE * 100).toFixed(1)%>%</td>
+					<% } %>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+<%- include('partials/footer') %>

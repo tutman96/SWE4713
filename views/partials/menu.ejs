@@ -2,6 +2,9 @@
 	<li class="sidebar-brand">
 		SWE4713 - Accounting
 	</li>
+	<li <%- (path == '/' ? 'class="active"' : "")%>>
+		<a href="/">Dashboard</a>
+	</li>
 	<li <%- (path.indexOf("/account") == 0 ? 'class="active"' : "")%>>
 		<a href="/accounts">Accounts</a>
 	</li>
@@ -12,17 +15,17 @@
 		<a>Reports</a>
 		<ul>
 			<li <%- (path.indexOf("/reports/trial-balance") == 0 ? 'class="active"' : "")%>>
-				<a href="/reports/trial-balance">Adjusted Trial Balance</a>
-			</li>
-			<li <%- (path.indexOf("/reports/retained-earnings") == 0 ? 'class="active"' : "")%>>
-				<a href="/reports/retained-earnings">Retained Earnings</a>
-			</li>
-			<li <%- (path.indexOf("/reports/closing-balance") == 0 ? 'class="active"' : "")%>>
-				<a href="/reports/closing-balance">Post-Closing Trial Balance</a>
+				<a href="/reports/trial-balance">Trial Balance</a>
 			</li>
 			<li <%- (path.indexOf("/reports/income-statement") == 0 ? 'class="active"' : "")%>>
 				<a href="/reports/income-statement">Income Statment</a>
 			</li>
+			<li <%- (path.indexOf("/reports/retained-earnings") == 0 ? 'class="active"' : "")%>>
+				<a href="/reports/retained-earnings">Retained Earnings</a>
+			</li>
+			<!--<li <%- (path.indexOf("/reports/closing-balance") == 0 ? 'class="active"' : "")%>>
+				<a href="/reports/closing-balance">Post-Closing Trial Balance</a>
+			</li>-->
 			<li <%- (path.indexOf("/reports/balance-sheet") == 0 ? 'class="active"' : "")%>>
 				<a href="/reports/balance-sheet">Balance Sheet</a>
 			</li>

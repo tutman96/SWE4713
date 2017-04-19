@@ -121,6 +121,9 @@ reports(app);
 import eventlog = require('./controllers/eventlog');
 eventlog(app);
 
+import dashboard = require('./controllers/dashboard');
+dashboard(app);
+
 app.use((req, res) => {
 	res.status(404);
 	res.render("404");

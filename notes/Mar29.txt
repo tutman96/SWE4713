@@ -11,4 +11,4 @@ show event log working
 √	dividends can be 0
 √ add journal entry categories (standard, adjusting, closing)
 √ add statement of retained earnings**
-add ratios and dashboard**
+√ add ratios and dashboard**

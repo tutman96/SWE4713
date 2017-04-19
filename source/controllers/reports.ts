@@ -38,7 +38,7 @@ export = (app: express.Application) => {
 		})
 
 		return helpers.render(res, 'reports/trial-balance', {
-			title: "Adjusted Trial Balance",
+			title: "Trial Balance",
 			totalDebit,
 			totalCredit,
 			startDate,
@@ -101,8 +101,7 @@ export = (app: express.Application) => {
 				CreatedDate BETWEEN ? AND ? AND 
 				State = "APPROVED" AND
 				Account.Active = 1 AND 
-				(AccountType.AccountType = 'Expense' OR AccountType.AccountType = 'Revenue') AND
-				(Entry.Type != 'CLOSING')
+				(AccountType.AccountType = 'Expense' OR AccountType.AccountType = 'Revenue')
 			GROUP BY AccountNumber 
 			ORDER BY IncreaseEntry DESC, SortOrder ASC`, [startDate, endDate])
 

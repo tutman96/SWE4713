@@ -50,7 +50,7 @@
 				<th colspan="3">Expenses</th>
 			</tr>
 		</thead>
-		<% var firstAccountDollarSign = true, totalExpense = 0; %>
+		<% totalExpense = 0; %>
 		<% for (var balance of expenses) { totalExpense += balance.Value %>
 			<tr>
 				<td><a href="/account/<%=balance.AccountNumber%>"><%=balance.AccountName%></a></td>
