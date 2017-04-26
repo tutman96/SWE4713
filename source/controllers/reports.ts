@@ -121,7 +121,7 @@ export = (app: express.Application) => {
 		var startDate = (req.query['startDate'] ? new Date(req.query['startDate']) : new Date(0));
 		var endDate = (req.query['endDate'] ? new Date(req.query['endDate']) : new Date());
 
-		var balances = await database.query<{ AccountNumber: number, AccountName: string, AccountType: "Asset" | "Liability" | "Equity", SubAccountType: string, Value: number }>(`
+		var balances = await database.query<{ AccountNumber: number, AccountName: string, AccountType: "Asset" | "Liability" | "Equity" | "Expense" | "Revenue", SubAccountType: string, Value: number }>(`
 		SELECT AccountNumber, AccountName, AccountType, SubAccountType, COALESCE(SUM(Value),0) as Value FROM Account 
 			LEFT JOIN Transaction USING (AccountNumber) 
 			LEFT JOIN Entry USING (EntryId)
@@ -129,14 +129,26 @@ export = (app: express.Application) => {
   			WHERE 
 				CreatedDate BETWEEN ? AND ? AND 
 				State = "APPROVED" AND
-				Account.Active = 1 AND 
-				(AccountType.AccountType = 'Asset' OR AccountType.AccountType = 'Liability' OR AccountType.AccountType = 'Equity')
+				Account.Active = 1
 			GROUP BY AccountNumber 
 			ORDER BY IncreaseEntry DESC, SubAccountType ASC, SortOrder ASC`, [startDate, endDate])
 
 		var assets = balances.filter((b) => b.AccountType == "Asset")
 		var liabilities = balances.filter((b) => b.AccountType == "Liability")
 		var equities = balances.filter((b) => b.AccountType == "Equity")
+		
+		if (!equities.find((e) => e.AccountNumber == 325)) {
+			var expense = balances.filter((b) => b.AccountType == "Expense").reduce((sum, a) => sum + a.Value, 0);
+			var revenue = balances.filter((b) => b.AccountType == "Revenue").reduce((sum, a) => sum + a.Value, 0);
+			var retainedEarnings = revenue - expense;
+			equities.push({
+				AccountNumber: 325,
+				AccountName: "Retained Earnings",
+				AccountType: "Equity",
+				SubAccountType: "",
+				Value: retainedEarnings
+			})
+		}
 		
 		var assetSubTypes = assets.reduce((subTypes, a) => {
 			if (subTypes.indexOf(a.SubAccountType) == -1) subTypes.push(a.SubAccountType);

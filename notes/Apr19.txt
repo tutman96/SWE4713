@@ -1,0 +1,7 @@
+Add liquidity ratio 
+	Current ratio: (assets / liabilities)
+	Quick ratio: (CurrentAssets - Inventory) / Liabilities
+	
+Add Inventory Turnover (Revenue / Inventory)
+
+Fixed Assets = ~Current Assets

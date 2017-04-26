@@ -2,7 +2,7 @@
 	<% var firstDebitDollarSign = true, firstCreditDollarSign = true; %>
 	<td rowspan="<%= entry.transactions.length + 1 %>"><%=dateFormat(entry.CreatedDate,'LL')%></td>
 	<% for (var i in entry.transactions) { var transaction = entry.transactions[i]; %>
-		<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT') { %>
+		<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT' && transaction.Value >= 0 || transaction.account.AccountType.IncreaseEntry == 'CREDIT' && transaction.Value <= 0) { %>
 			<td><a href="/account/<%=transaction.account.AccountNumber%>"><%=transaction.account.AccountName%></a></td>
 		<% } else { %>
 			<td><a href="/account/<%=transaction.account.AccountNumber%>" style="padding-left:2em"><%=transaction.account.AccountName%></a></td>

@@ -75,7 +75,7 @@
 				</thead>
 				<% for (var transaction of entry.transactions) { %>
 				<tr id="Transaction-Account:<%=transaction.AccountNumber%>">
-					<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT') { %>
+					<% if (transaction.account.AccountType.IncreaseEntry == 'DEBIT' && transaction.Value >= 0 || transaction.account.AccountType.IncreaseEntry == 'CREDIT' && transaction.Value <= 0) { %>
 						<td><a href="/account/<%=transaction.account.AccountNumber%>"><%=transaction.account.AccountName%></a></td>
 					<% } else { %>
 						<td><a href="/account/<%=transaction.account.AccountNumber%>" style="padding-left:2em"><%=transaction.account.AccountName%></a></td>
