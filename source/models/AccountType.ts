@@ -1,7 +1,6 @@
 import database = require('../database');
 import { default as queryBuilder, query } from '../querybuilder';
 
-export = AccountType;
 class AccountType {
 	AccountType: string
 	MinCode: number
@@ -34,3 +33,4 @@ class AccountType {
 		return this.AccountType + " (#" + this.MinCode + " - #" + this.MaxCode + ")"
 	}
 }
+export = AccountType;

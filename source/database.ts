@@ -3,7 +3,7 @@ import mysql = require('mysql');
 var pool = mysql.createPool({
 	database: "appdomain",
 	user: "appdomain",
-	host: "localhost",
+	host: process.env.MYSQL_HOST || "localhost",
 	connectionLimit: 5
 });
 
