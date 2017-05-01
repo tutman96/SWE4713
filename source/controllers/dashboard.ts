@@ -40,13 +40,19 @@ export = (app: express.Application) => {
 			}
 		}
 
+		var currentAssets = (await database.query<{ Total: number }>(`SELECT SubAccountType, SUM(Value) as Total FROM Transaction 
+					JOIN Entry USING (EntryId) 
+					JOIN Account USING (AccountNumber) 
+					WHERE Entry.Type != "CLOSING" AND Entry.State = "APPROVED" AND Account.SubAccountType = "Current Asset"
+					GROUP BY SubAccountType`))[0].Total
+
 		var ratios = data.map((entry) => {
 			var assets = entry.Totals['Asset'];
 			var liabilities = entry.Totals['Liability'];
 			var equities = entry.Totals['Equity'];
 			var revenues = entry.Totals['Revenue'];
 			var expenses = entry.Totals['Expense'];
-			
+
 			var cogs = entry.COGS;
 			var ebit = revenues - expenses;
 			var ni = ebit;
@@ -56,26 +62,32 @@ export = (app: express.Application) => {
 				Month: entry.Month,
 				Year: entry.Year,
 				
+				// Fixed Asset Turnover
+				FATO: (sales) / (assets - currentAssets),
+				
 				// Total Asset Turnover
 				TAT: sales / assets,
-				
+
 				// Debt Ratio
 				DR: liabilities / assets,
-				
+
 				// Profit Margin
 				PM: ni / expenses,
 				// Operating Profit Margin
 				OPM: ebit / revenues,
 				// Gross Profit Margin
 				GPM: (sales - cogs) / sales,
-				
+
 				// Basic Earning Power
 				BEP: ebit / assets,
-				
+
 				// Return on Assets
 				ROA: ni / assets,
 				// Return on Equity
-				ROE: ni / equities
+				ROE: ni / equities,
+
+				// Current ratio
+				CR: assets / liabilities,
 			}
 		})
 

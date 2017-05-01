@@ -17,15 +17,21 @@
 					</tr>
 				</thead>
 				<tr>
-					<th class="col-sm-2">FA TO</th>
+					<th class="col-sm-2">Fixed Asset Turnover</th>
 					<% for (var d of data) { %>
-						<td>N/A</td>
+						<td><%=d.FATO.toFixed(2)%> <i class="glyphicon glyphicon-ok-circle text-success"></i></td>
 					<% } %>
 				</tr>
 				<tr>
-					<th class="col-sm-2">TA TO</th>
+					<th class="col-sm-2">Total Asset Turnover</th>
 					<% for (var d of data) { %>
-						<td><%=d.TAT.toFixed(2)%></td>
+						<td><%=d.TAT.toFixed(2)%> <i class="glyphicon glyphicon-ok-circle text-success"></td>
+					<% } %>
+				</tr>
+				<tr>
+					<th class="col-sm-2">Inventory Turnover</th>
+					<% for (var d of data) { %>
+						<td>N/A</td>
 					<% } %>
 				</tr>
 			</table>
@@ -45,19 +51,19 @@
 					</tr>
 				</thead>
 				<tr>
-					<th class="col-sm-2">D/A</th>
+					<th class="col-sm-2">Debt Ratio</th>
 					<% for (var d of data) { %>
-						<td><%=(d.DR * 100).toFixed(1)%>%</td>
+						<td><%=(d.DR * 100).toFixed(1)%>% <i class="glyphicon glyphicon-ok-circle text-success"></td>
 					<% } %>
 				</tr>
 				<tr>
-					<th class="col-sm-2">TIE</th>
+					<th class="col-sm-2">Times Interest Earned</th>
 					<% for (var d of data) { %>
 						<td>N/A</td>
 					<% } %>
 				</tr>
 				<tr>
-					<th class="col-sm-2">EC</th>
+					<th class="col-sm-2">EBITDA Coverage</th>
 					<% for (var d of data) { %>
 						<td>N/A</td>
 					<% } %>
@@ -79,21 +85,21 @@
 					</tr>
 				</thead>
 				<tr>
-					<th class="col-sm-2">PM</th>
+					<th class="col-sm-2">Profit Margin</th>
 					<% for (var d of data) { %>
-						<td><%=(d.PM * 100).toFixed(1)%>%</td>
+						<td><%=(d.PM * 100).toFixed(1)%>% <i class="glyphicon glyphicon-ok-circle text-success"></td>
 					<% } %>
 				</tr>
 				<tr>
-					<th class="col-sm-2">OPM</th>
+					<th class="col-sm-2">Operating Profit Margin</th>
 					<% for (var d of data) { %>
-						<td><%=(d.OPM * 100).toFixed(1)%>%</td>
+						<td><%=(d.OPM * 100).toFixed(1)%>% <i class="glyphicon glyphicon-ok-circle text-success"></td>
 					<% } %>
 				</tr>
 				<tr>
-					<th class="col-sm-2">GPM</th>
+					<th class="col-sm-2">Gross Profit Margin</th>
 					<% for (var d of data) { %>
-						<td><%=(d.GPM * 100).toFixed(1)%>%</td>
+						<td><%=(d.GPM * 100).toFixed(1)%>% <i class="glyphicon glyphicon-ok-circle text-success"></td>
 					<% } %>
 				</tr>
 			</table>
@@ -115,9 +121,9 @@
 					</tr>
 				</thead>
 				<tr>
-					<th class="col-sm-2">BEP</th>
+					<th class="col-sm-2">Basic Earning Power</th>
 					<% for (var d of data) { %>
-						<td><%=(d.BEP * 100).toFixed(1)%>%</td>
+						<td><%=(d.BEP * 100).toFixed(1)%>% <i class="glyphicon glyphicon-ok-circle text-success"></td>
 					<% } %>
 				</tr>
 			</table>
@@ -137,15 +143,43 @@
 					</tr>
 				</thead>
 				<tr>
-					<th class="col-sm-2">ROA</th>
+					<th class="col-sm-2">Return on Investment</th>
 					<% for (var d of data) { %>
-						<td><%=(d.ROA * 100).toFixed(1)%>%</td>
+						<td><%=(d.ROA * 100).toFixed(1)%>% <i class="glyphicon glyphicon-ok-circle text-success"></td>
 					<% } %>
 				</tr>
 				<tr>
-					<th class="col-sm-2">ROE</th>
+					<th class="col-sm-2">Return on Equity</th>
 					<% for (var d of data) { %>
-						<td><%=(d.ROE * 100).toFixed(1)%>%</td>
+						<td><%=(d.ROE * 100).toFixed(1)%>% <i class="glyphicon glyphicon-ok-circle text-success"></td>
+					<% } %>
+				</tr>
+			</table>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Liquidity Ratios
+			</div>
+			<table class="table table-hover table-condensed">
+				<thead>
+					<tr>
+						<th class="col-sm-2"></th>
+						<% for (var d of data) { %>
+							<th><%=dateFormat(new Date(d.Year, d.Month - 1), 'MMM YYYY')%></th>
+						<% } %>
+					</tr>
+				</thead>
+				<tr>
+					<th class="col-sm-2">Current Ratio</th>
+					<% for (var d of data) { %>
+						<td><%=(d.CR * 100).toFixed(1)%>% <i class="glyphicon glyphicon-ok-circle text-success"></td>
+					<% } %>
+				</tr>
+				<tr>
+					<th class="col-sm-2">Quick Ratio</th>
+					<% for (var d of data) { %>
+						<td>N/A</td>
 					<% } %>
 				</tr>
 			</table>
